@@ -1,0 +1,16 @@
+<: ;#fix header :>
+<: setFileProcessingOrder late :>
+<: setOutputDirectory "./xdc" :>
+<: setFileName [getComponentNameString] :>
+<: setFileExtension ".xdc" :>
+<: setFileUsedIn {implementation} :>
+set mem_clk  [get_clocks -quiet -of [get_ports mem_clk]]
+set axil_clk [get_clocks -quiet -of [get_ports s_axil_aclk]]
+set mem_clk_period  [get_property -quiet -min PERIOD $mem_clk]
+set axil_clk_period [get_property -quiet -min PERIOD $axil_clk]
+set_false_path -through [get_ports rst]
+set_false_path -to [get_cells -hier d_meta_reg[0][*]] -quiet
+set_false_path -to [get_cells -hier rst_meta_reg[*]] -quiet
+set_false_path -to [get_cells -hier *channel_en_reg*] -quiet
+set_max_delay -from [filter [all_fanout -from [get_ports mem_clk] -flat -endpoints_only] {IS_LEAF}] -through [get_pins -of_obj [get_cells -hier * -filter {NAME=~*u_simple_dp_ram/mem_int_reg*}] -filter {DIRECTION==OUT}] $mem_clk_period -datapath_only
+set_max_delay -from [filter [all_fanout -from [get_ports s_axil_aclk] -flat -endpoints_only] {IS_LEAF}] -through [get_pins -of_obj [get_cells -hier * -filter {NAME=~*mbc_int_reg*}] -filter {DIRECTION==OUT}] $mem_clk_period -datapath_only

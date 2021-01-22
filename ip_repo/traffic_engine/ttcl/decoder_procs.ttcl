@@ -1,0 +1,50 @@
+<: proc log2 x "expr {int(floor(log(\$x)/[expr log(2)]))}" :>
+<: proc log2h x "expr {int(ceil(log(\$x)/[expr log(2)]))}" :>
+<: proc get_seg_widths dw { :>
+<:	   set seg_widths "" :>
+<:     set remain_width $dw :>
+<:     while {$remain_width != 0} { :>
+<:          if {[expr 2**[log2h $remain_width]] == $remain_width} { :>
+<:				lappend seg_widths $remain_width :>
+<:				break :>
+<:			} else { :>
+<:				set curr_width [expr 2**[log2 $remain_width]] :>
+<:	 	        set remain_width [expr $remain_width-$curr_width] :>
+<:		        lappend seg_widths $curr_width :>
+<:			} :>
+<:     } :>
+<:     return $seg_widths :>
+<: } :>
+<: proc create_config {dw {bw 64}} { :>
+<:		set seg_widths [get_seg_widths $dw] :>
+<:		set tail_dw [lindex $seg_widths end] :>
+<:		if {$tail_dw >= $bw} { :>
+<:			set base_cnt 1 :>
+<:		} else { :>
+<:			set base_cnt [expr $bw/$tail_dw] :>
+<:		} :>
+<:		set fifo_depths "" :>
+<:		set input_reg_widths "" :>
+<:		set next_state_cycle_idx "" :>
+<:		set state_cnt_widths "" :>
+<:		foreach seg_width $seg_widths { :>
+<:			if {$seg_width > $bw} { :>
+<:				set fifo_depth [expr 2*$base_cnt] :>
+<:			} else { :>
+<:				set fifo_depth [expr 2*$base_cnt*$seg_width/$bw] :>
+<:			} :>
+<:			lappend next_state_cycle_idxs [expr $seg_width*$base_cnt/$bw-1] :>
+<:			lappend state_cnt_widths [log2 [expr $seg_width*$base_cnt/$bw]] :>
+<:			lappend state_cnt_widthsm1 [expr [log2 [expr $seg_width*$base_cnt/$bw]]-1] :>
+<:			lappend fifo_depths $fifo_depth :>
+<:		} :>
+<:		set config_dict {} :>
+<:		dict append config_dict seg_widths $seg_widths :>
+<:		dict append config_dict fifo_depths $fifo_depths :>
+<:		dict append config_dict fifo_cnt [llength $seg_widths] :>
+<:		dict append config_dict state_width [log2h [llength $seg_widths]] :>
+<:		dict append config_dict next_state_cycle_idxs $next_state_cycle_idxs :>
+<:		dict append config_dict state_cnt_widths $state_cnt_widths :>
+<:		dict append config_dict state_cnt_widthsm1 $state_cnt_widthsm1 :>
+<:		return $config_dict :>
+<: } :>

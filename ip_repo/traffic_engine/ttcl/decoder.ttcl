@@ -1,0 +1,158 @@
+<: ;#fix header :>
+<: set ComponentName [getComponentNameString] :>
+<: setFileName "decoder" :>
+<: setFileExtension ".sv" :>
+<: setOutputDirectory "rtl/decoder" :>
+<: ;#variables :>
+<#: ttcl/decoder_procs.ttcl :>
+`timescale 1ns/1ps
+<: set N_CHANNLES [getIntValue "N_CHANNELS"] :>
+<: set MEM_WIDTH [getIntValue "MEM_WIDTH"] :>
+<: set ADDR_WIDTH [getIntValue "ADDR_WIDTH"] :>
+<: for {set channel_idx 0} {$channel_idx < $N_CHANNLES} {incr channel_idx} { :>
+<: set INSTR_WIDTH [expr [getIntValue "INSTR${channel_idx}_WIDTH"]*8] :>
+<: if {$MEM_WIDTH != $INSTR_WIDTH} { :>
+<: set config_dict [create_config $INSTR_WIDTH $MEM_WIDTH] :>
+<: set seg_widths [dict get $config_dict seg_widths] :>
+<: set fifo_depths [dict get $config_dict fifo_depths] :>
+<: set fifo_cnt [dict get $config_dict fifo_cnt] :>
+<: set fifo_cntm1 [expr $fifo_cnt-1] :>
+<: set state_width [dict get $config_dict state_width] :>
+<: set state_widthm1 [expr $state_width-1] :>
+<: set next_state_cycle_idxs [dict get $config_dict next_state_cycle_idxs] :>
+<: set state_cnt_widths [dict get $config_dict state_cnt_widths] :>
+<: set state_cnt_widthsm1 [dict get $config_dict state_cnt_widthsm1] :>
+<: } :>
+module decoder<=: $channel_idx :>
+(
+    input logic s_axis_aclk,
+    input logic m_axis_aclk,
+    input logic s_axis_rst,
+    input logic m_axis_rst,
+    input logic rst,
+//enable command
+    input logic enable,
+//memory in
+    input logic [<=: [expr $MEM_WIDTH-1] :>:0] mem_tdata,
+    input logic mem_tvalid,
+    output logic mem_tready,
+//flit number in
+    input logic [<=: [expr $ADDR_WIDTH-1] :>:0] flitcnt,
+//instruction out
+    output logic [<=: [expr $INSTR_WIDTH-1] :>:0] instr_tdata,
+    output logic instr_tvalid,
+    input logic instr_tready
+);
+<: if {$MEM_WIDTH == $INSTR_WIDTH} { :>
+    easy_fifo_axis_async #(
+        .DWIDTH     (<=: $MEM_WIDTH :>),
+        .DEPTH      (<=: [lindex $fifo_depths $i] :>),
+        .INPUT_REG  (1),
+        .OUTPUT_REG (1)
+    ) u_easy_fifo_axis_async(
+        .*,
+        .s_axis_tdata  (mem_tdata),
+        .s_axis_tvalid (mem_tvalid),
+        .s_axis_tready (mem_tready),
+        .m_axis_tdata  (instr_tdata),
+        .m_axis_tvalid (instr_tvalid&enable),
+        .m_axis_tready (instr_tready&enable),
+        .fifo_cnt_wr_synced(),
+        .fifo_cnt_rd_synced()
+    );
+endmodule
+<: continue :>
+<: } :>
+//states counters
+    logic [<=: $fifo_cntm1 :>:0] state_onehot = <=: $fifo_cnt :>'b<=: [string repeat 0 $fifo_cntm1] :>1;
+<: for {set i 0} {$i < $fifo_cnt} {incr i} { :>
+<:   set widthm1 [lindex $state_cnt_widthsm1 $i] :>
+<:   if {$widthm1 > 0} { :>
+    logic [<=: $widthm1 :>:0] state_cnt_<=: $i :>;
+<:   } elseif {$widthm1 == 0} { :>
+    logic state_cnt_<=: $i :>;
+<:   } :>
+<: } :>
+
+//fifo wires
+    logic [<=: $fifo_cntm1 :>:0] fifo_tready;
+    logic [<=: $fifo_cntm1 :>:0] fifo_tvalid;
+<: for {set i 0} {$i < $fifo_cnt} {incr i} { :>
+    logic [<=: [expr [lindex $seg_widths $i]-1] :>:0] fifo_tdata_<=: $i :>;
+<: } :>
+
+//flit cnt
+    logic [<=: [expr $ADDR_WIDTH-1] :>:0] flitcnt_int;
+
+    always_ff @(posedge s_axis_aclk) begin
+        if (s_axis_rst) begin
+            state_onehot <= <=: $fifo_cnt :>'b<=: [string repeat 0 $fifo_cntm1] :>1;
+<: for {set i 0} {$i < $fifo_cnt} {incr i} { :>
+<:   set width [lindex $state_cnt_widths $i] :>
+<:   if {$width > 0} { :>
+            state_cnt_<=: $i :> <= <=: width :>'b0;
+<:   } :>
+<: } :>
+        end
+        else if (mem_tvalid & mem_tready) begin
+            case (state_onehot)
+<: for {set i 0} {$i < $fifo_cnt} {incr i} { :>
+<:   set next_state_cycle_idx [lindex $next_state_cycle_idxs $i] :>
+<:   set width [lindex $state_cnt_widths $i] :>
+<:   set curr_state_onehot "${fifo_cnt}'b[string repeat 0 [expr $fifo_cntm1-$i]]1[string repeat 0 $i]" :>
+<:   if {$i != $fifo_cntm1} { :>
+<:      set next_state_onehot "${fifo_cnt}'b[string repeat 0 [expr $fifo_cntm1-$i-1]]1[string repeat 0 [expr $i+1]]" :>
+<:   } else {:>
+<:      set next_state_onehot "${fifo_cnt}'b[string repeat 0 $fifo_cntm1]1" :>
+<:   } :>
+                <=: $curr_state_onehot :>: begin
+<:   if {$width > 0} { :>
+                    state_cnt_<=: $i :> <= state_cnt_<=: $i :> + 1'b1;
+                    if (state_cnt_<=: $i :> == <=: width :>'d<=: $next_state_cycle_idx :>)
+                        state_onehot <= <=: $next_state_onehot :>;
+<:   } else { :>
+                    state_onehot <= <=: $next_state_onehot :>;
+<:   } :>
+                end
+<: } :>
+            endcase
+        end
+    end
+
+<: for {set i 0} {$i < $fifo_cnt} {incr i} { :>
+    decoder_fifo #(
+        .DWIDTH_IN   (<=: $MEM_WIDTH :>),
+        .DWIDTH_OUT  (<=: [lindex $seg_widths $i] :>),
+        .DEPTH       (<=: [lindex $fifo_depths $i] :>)
+    ) u_decoder_fifo_<=: $i :>(
+        .*,
+        .s_axis_tdata  (mem_tdata),
+        .s_axis_tvalid (mem_tvalid & state_onehot[<=: $i :>]),
+        .s_axis_tready (fifo_tready[<=: $i :>]),
+        .m_axis_tdata  (fifo_tdata_<=: $i :>),
+        .m_axis_tvalid (fifo_tvalid[<=: $i :>]),
+        .m_axis_tready (instr_tready & enable & (&fifo_tvalid))
+    );
+<: } :>
+    always_ff @(posedge m_axis_aclk) begin
+        if (~enable)
+            flitcnt_int <= flitcnt;
+        else if (instr_tready && (&fifo_tvalid) && (flitcnt_int != <=: $ADDR_WIDTH :>'b0))
+            flitcnt_int <= flitcnt_int - 1'b1;
+    end
+
+    assign mem_tready = |(state_onehot&fifo_tready);
+<: set curr_idx_low 0 :>
+<: for {set i 0} {$i < $fifo_cnt} {incr i} { :>
+<:  set curr_widthm1 [expr [lindex $seg_widths $i]-1] :>
+<:  set curr_idx_high [expr $curr_idx_low+$curr_widthm1] :>
+<:  if {[lindex $seg_widths $i] != [lindex $seg_widths $i]} { :>
+    assign instr_tdata[<=: $curr_idx_high :>:<=: $curr_idx_low :>] = fifo_tdata_<=: $i :>[<=: $curr_widthm1 :>:0];
+<:  } else { :>
+    assign instr_tdata[<=: $curr_idx_high :>:<=: $curr_idx_low :>] = fifo_tdata_<=: $i :>;
+<:  } :>
+<:  set curr_idx_low [expr $curr_idx_high+1] :>
+<: } :>
+    assign instr_tvalid = (&fifo_tvalid) && enable && (flitcnt_int != <=: $ADDR_WIDTH :>'b0);
+endmodule
+<: } :>

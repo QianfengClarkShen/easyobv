@@ -1,0 +1,18 @@
+#!/usr/bin/python3
+import libeasyobv as easyobv
+import sys
+import os
+
+def getext(fname):
+    return os.path.splitext(fname)[1]
+
+if __name__ == '__main__':
+    args = sys.argv[1:]
+    for arg in args:
+        if getext(arg) != '.csv' and getext(arg) != '.bin' and getext(arg) != '.txt' and arg != '-':
+            print("Argument error!")
+            print("Usage:\n    ./program <traffic0> <traffic1> .. <trafficN>\n")
+            print("Supported file extensions: csv, bin, and txt")
+            print("Example:\n    ./program traffic0.csv traffic1.bin - traffic3.bin ('-' means the correspoding channel is skipped)")
+            sys.exit()
+    easyobv.program(args,0)

@@ -1,0 +1,44 @@
+#!/usr/bin/python3
+from libeasyobv import *
+import argparse
+import sys
+
+input_path=None
+output_path=None
+mem_width=-1
+overwrite=False
+
+def msg(name=None):
+    return '''gen_traffic_binary -mem_width <int>  <source.csv|source.txt> [<target.bin>]'''
+class arg_parser:
+    def __init__(self):
+        self.parser = argparse.ArgumentParser(
+            prog='gen_traffic_binary',
+            formatter_class=argparse.MetavarTypeHelpFormatter,
+            description='Available options:', usage=msg())
+        self.parser.add_argument('input_path', metavar='<input file>', type=str, help='input file path')
+        self.parser.add_argument('output_path', nargs='?', default=None, metavar='<output file>', type=str, help='output file path')
+        self.parser.add_argument('-mem_width', default=512, type=int, help='memory bus width in bits')
+        self.parser.add_argument('-overwrite', action="store_true", help='force overwrite the binary file if it\'s already existed')
+    def parse(self):
+        global input_path
+        global output_path
+        global mem_width
+        global overwrite
+        self.args = self.parser.parse_args()
+        input_path = self.args.input_path
+        output_path = self.args.output_path
+        mem_width = self.args.mem_width
+        overwrite = self.args.overwrite
+        if not input_path:
+            print('ERROR: no input file provided')
+            sys.exit()
+        if mem_width <= 0 or mem_width%8 != 0:
+            print('ERROR: memory width should be a positive interger that is a multiple of 8')
+            sys.exit()
+
+if __name__ == '__main__':
+    args=arg_parser()
+    args.parse()
+    if gen_binary(input_path,mem_width,output_path,overwrite,channel_idx=-1) == True:
+        print('!!!Failed generating binary file')
