@@ -1,3 +1,9 @@
+### TRAFFIC CLOCK##########################################
+#create_clock -period 10.000 [get_ports traffic_clk_clk_p]
+#set_property IOSTANDARD LVDS_25 [get_ports {traffic_clk_clk_p[0]}]
+#set_property IOSTANDARD LVDS_25 [get_ports {traffic_clk_clk_n[0]}]
+#set_property PACKAGE_PIN C4 [get_ports {traffic_clk_clk_p[0]}]
+#set_property PACKAGE_PIN C3 [get_ports {traffic_clk_clk_n[0]}
 #create_clock -period 10.000 [get_ports pcie_clk_clk_p]
 #set_property LOC [get_package_pins -of_objects [get_bels [get_sites -filter {NAME =~ *COMMON*} -of_objects [get_iobanks -of_objects [get_sites GTHE4_CHANNEL_X0Y7]]]/REFCLK0P]] [get_ports pcie_clk_clk_p]
 #set_property LOC [get_package_pins -of_objects [get_bels [get_sites -filter {NAME =~ *COMMON*} -of_objects [get_iobanks -of_objects [get_sites GTHE4_CHANNEL_X0Y7]]]/REFCLK0N]] [get_ports pcie_clk_clk_n]

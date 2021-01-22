@@ -259,7 +259,7 @@ proc create_hier_cell_dut { parentCell nameHier } {
   # Create interface pins
   create_bd_intf_pin -mode Slave -vlnv xilinx.com:interface:axis_rtl:1.0 S_AXIS
 
-  create_bd_intf_pin -mode Slave -vlnv xilinx.com:interface:diff_clock_rtl:1.0 traffic_clk_DS
+  create_bd_intf_pin -mode Slave -vlnv xilinx.com:interface:diff_clock_rtl:1.0 traffic_clk
 
 
   # Create pins
@@ -291,7 +291,7 @@ proc create_hier_cell_dut { parentCell nameHier } {
 
   # Create interface connections
   connect_bd_intf_net -intf_net Conn1 [get_bd_intf_pins S_AXIS] [get_bd_intf_pins axis_register_slice_0/S_AXIS]
-  connect_bd_intf_net -intf_net Conn3 [get_bd_intf_pins traffic_clk_DS] [get_bd_intf_pins util_ds_buf_0/CLK_IN_D]
+  connect_bd_intf_net -intf_net Conn3 [get_bd_intf_pins traffic_clk] [get_bd_intf_pins util_ds_buf_0/CLK_IN_D]
   connect_bd_intf_net -intf_net axis_register_slice_0_M_AXIS [get_bd_intf_pins axis_register_slice_0/M_AXIS] [get_bd_intf_pins axis_register_slice_1/S_AXIS]
 
   # Create port connections
@@ -352,13 +352,16 @@ proc create_root_design { parentCell INSTR_BYTES easyobv_config} {
    ] $traffic_clk
 
 
+  set EN_AXIL [dict get $easyobv_config CONFIG.EN_AXIL]
   # Create ports
 
   # Create instance: const_zero, and set properties
-  set const_zero [ addip xlconstant const_zero ]
-  set_property -dict [ list \
-   CONFIG.CONST_VAL {0} \
- ] $const_zero
+  if {$EN_AXIL == 0} {
+    set const_zero [ addip xlconstant const_zero ]
+    set_property -dict [ list \
+     CONFIG.CONST_VAL {0} \
+    ] $const_zero
+  }
 
   # Create instance: dut
   create_hier_cell_dut [current_bd_instance .] dut
@@ -409,7 +412,7 @@ proc create_root_design { parentCell INSTR_BYTES easyobv_config} {
   connect_bd_intf_net -intf_net S00_AXI_1 [get_bd_intf_pins memory/S00_AXI] [get_bd_intf_pins xdma/M_AXI]
   connect_bd_intf_net -intf_net easyobv_axis_0_traffic [get_bd_intf_pins dut/S_AXIS] [get_bd_intf_pins easyobv_axis_0/traffic]
   connect_bd_intf_net -intf_net [get_bd_intf_nets easyobv_axis_0_traffic] [get_bd_intf_pins dut/S_AXIS] [get_bd_intf_pins system_ila/SLOT_0_AXIS]
-  connect_bd_intf_net -intf_net traffic_clk_DS_1 [get_bd_intf_ports traffic_clk] [get_bd_intf_pins dut/traffic_clk_DS]
+  connect_bd_intf_net -intf_net traffic_clk_1 [get_bd_intf_ports traffic_clk] [get_bd_intf_pins dut/traffic_clk]
   connect_bd_intf_net -intf_net traffic_engine_0_instr0 [get_bd_intf_pins easyobv_axis_0/instr] [get_bd_intf_pins traffic_engine_0/instr0]
   connect_bd_intf_net -intf_net traffic_engine_0_m_axi [get_bd_intf_pins memory/S01_AXI] [get_bd_intf_pins traffic_engine_0/m_axi]
   connect_bd_intf_net -intf_net xdma_M00_AXI [get_bd_intf_pins traffic_engine_0/s_axil] [get_bd_intf_pins xdma/M00_AXI]
@@ -423,7 +426,9 @@ proc create_root_design { parentCell INSTR_BYTES easyobv_config} {
   connect_bd_net -net util_vector_logic_Res [get_bd_pins system_ila/resetn] [get_bd_pins util_vector_logic/Res]
   connect_bd_net -net vio_0_probe_out0 [get_bd_pins traffic_engine_0/rst] [get_bd_pins vio_0/probe_out0]
   connect_bd_net -net xdma_axi_aresetn [get_bd_pins memory/pcie_rstn] [get_bd_pins xdma/axi_aresetn]
-  connect_bd_net -net xlconstant_0_dout [get_bd_pins const_zero/dout] [get_bd_pins easyobv_axis_0/pause] [get_bd_pins easyobv_axis_0/timeout_clr]
+  if {$EN_AXIL == 0} {
+    connect_bd_net -net xlconstant_0_dout [get_bd_pins const_zero/dout] [get_bd_pins easyobv_axis_0/pause] [get_bd_pins easyobv_axis_0/timeout_clr]
+  }
 
   # Create address segments
   assign_bd_address -offset 0x00000000 -range 0x000400000000 -target_address_space [get_bd_addr_spaces traffic_engine_0/m_axi] [get_bd_addr_segs memory/ddr4_0/C0_DDR4_MEMORY_MAP/C0_DDR4_ADDRESS_BLOCK] -force

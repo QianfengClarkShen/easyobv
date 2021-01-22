@@ -1,9 +1,9 @@
 ### TRAFFIC CLOCK##########################################
-#create_clock -period 10.000 [get_ports traffic_clk_DS_clk_p]
-#set_property IOSTANDARD LVDS_25 [get_ports {traffic_clk_DS_clk_p[0]}]
-#set_property IOSTANDARD LVDS_25 [get_ports {traffic_clk_DS_clk_n[0]}]
-#set_property PACKAGE_PIN C4 [get_ports {traffic_clk_DS_clk_p[0]}]
-#set_property PACKAGE_PIN C3 [get_ports {traffic_clk_DS_clk_n[0]}]
+#create_clock -period 10.000 [get_ports traffic_clk_clk_p]
+#set_property IOSTANDARD LVDS_25 [get_ports {traffic_clk_clk_p[0]}]
+#set_property IOSTANDARD LVDS_25 [get_ports {traffic_clk_clk_n[0]}]
+#set_property PACKAGE_PIN C4 [get_ports {traffic_clk_clk_p[0]}]
+#set_property PACKAGE_PIN C3 [get_ports {traffic_clk_clk_n[0]}]
 ### DDR CLOCK##############################################
 #
 ### DDR4###################################################

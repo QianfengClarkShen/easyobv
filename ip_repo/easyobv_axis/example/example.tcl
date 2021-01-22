@@ -43,7 +43,6 @@ if {$AXIL != 0} {
         assign_bd_address [get_bd_addr_segs {easyobv_axis_0/s_axil/reg0 }]
         set_property range 4K [get_bd_addr_segs {processor/zynq_ultra_ps_e_0/Data/SEG_easyobv_axis_0_reg0}]
         set_property offset 0x00A0012000 [get_bd_addr_segs {processor/zynq_ultra_ps_e_0/Data/SEG_easyobv_axis_0_reg0}]
-        delete_bd_objs [get_bd_cells const_zero]
     } else {
         set_property -dict [list CONFIG.NUM_MI {2}] [get_bd_cells xdma/smartconnect_0]
         connect_bd_net [get_bd_pins easyobv_axis_0/s_axil_aclk] [get_bd_pins xdma/axi_aclk]
@@ -51,7 +50,6 @@ if {$AXIL != 0} {
         assign_bd_address [get_bd_addr_segs {easyobv_axis_0/s_axil/reg0 }]
         set_property range 4K [get_bd_addr_segs {xdma/xdma_0/M_AXI_LITE/SEG_easyobv_axis_0_reg0}]
         set_property offset 0x00001000 [get_bd_addr_segs {xdma/xdma_0/M_AXI_LITE/SEG_easyobv_axis_0_reg0}]
-        delete_bd_objs [get_bd_cells const_zero]
     }
 }
 
@@ -60,10 +58,17 @@ if {$MODE == 1} {
     connect_bd_intf_net [get_bd_intf_pins system_ila/SLOT_1_DBG_EASYOBV] [get_bd_intf_pins easyobv_axis_0/dbg]
 } elseif {$MODE ==2} {
     set_property -dict [list CONFIG.C_SLOT {2} CONFIG.C_BRAM_CNT {6.5} CONFIG.C_NUM_MONITOR_SLOTS {3} CONFIG.C_SLOT_1_INTF_TYPE {xilinx.com:interface:axis_rtl:1.0} CONFIG.C_SLOT_2_INTF_TYPE {clarkshen.com:user:dbg_easyobv_rtl:1.0}] [get_bd_cells system_ila]
-    connect_bd_intf_net [get_bd_intf_pins app/axis_register_slice_1/M_AXIS] [get_bd_intf_pins easyobv_axis_0/rx_mon]
-    connect_bd_intf_net [get_bd_intf_pins system_ila/SLOT_1_AXIS] -boundary_type upper [get_bd_intf_pins app/M_AXIS]
+    connect_bd_intf_net [get_bd_intf_pins dut/axis_register_slice_1/M_AXIS] [get_bd_intf_pins easyobv_axis_0/rx_mon]
+    connect_bd_intf_net [get_bd_intf_pins system_ila/SLOT_1_AXIS] -boundary_type upper [get_bd_intf_pins dut/M_AXIS]
     connect_bd_intf_net [get_bd_intf_pins system_ila/SLOT_2_DBG_EASYOBV] [get_bd_intf_pins easyobv_axis_0/dbg]
 }
+
+if {$TYPE_EX == 0} {
+    remove_files  -fileset constrs_1 ${project_dir}/imports/mpsoc.xdc
+} else {
+    remove_files  -fileset constrs_1 ${project_dir}/imports/xdma.xdc
+}
+
 save_bd_design
 validate_bd_design
 make_wrapper -files [get_files ${project_dir}/${project_name}.srcs/sources_1/bd/easyobv_ex/easyobv_ex.bd] -top
