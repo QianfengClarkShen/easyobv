@@ -370,12 +370,12 @@ proc create_root_design { parentCell INSTR_BYTES easyobv_config} {
   # Create instance: memory
   create_hier_cell_memory [current_bd_instance .] memory
 
-  # Create instance: system_ila_0, and set properties
-  set system_ila_0 [ addip system_ila system_ila_0 ]
+  # Create instance: system_ila, and set properties
+  set system_ila [ addip system_ila system_ila ]
   set_property -dict [ list \
    CONFIG.C_BRAM_CNT {6} \
    CONFIG.C_SLOT_0_INTF_TYPE {xilinx.com:interface:axis_rtl:1.0} \
- ] $system_ila_0
+ ] $system_ila
 
   # Create instance: traffic_engine_0, and set properties
   set traffic_engine_0 [ addip traffic_engine traffic_engine_0 ]
@@ -408,7 +408,7 @@ proc create_root_design { parentCell INSTR_BYTES easyobv_config} {
   connect_bd_intf_net -intf_net DDR_C0_DDR4_0 [get_bd_intf_ports C0_DDR4_0] [get_bd_intf_pins memory/C0_DDR4_0]
   connect_bd_intf_net -intf_net S00_AXI_1 [get_bd_intf_pins memory/S00_AXI] [get_bd_intf_pins xdma/M_AXI]
   connect_bd_intf_net -intf_net easyobv_axis_0_traffic [get_bd_intf_pins dut/S_AXIS] [get_bd_intf_pins easyobv_axis_0/traffic]
-  connect_bd_intf_net -intf_net [get_bd_intf_nets easyobv_axis_0_traffic] [get_bd_intf_pins dut/S_AXIS] [get_bd_intf_pins system_ila_0/SLOT_0_AXIS]
+  connect_bd_intf_net -intf_net [get_bd_intf_nets easyobv_axis_0_traffic] [get_bd_intf_pins dut/S_AXIS] [get_bd_intf_pins system_ila/SLOT_0_AXIS]
   connect_bd_intf_net -intf_net traffic_clk_DS_1 [get_bd_intf_ports traffic_clk] [get_bd_intf_pins dut/traffic_clk_DS]
   connect_bd_intf_net -intf_net traffic_engine_0_instr0 [get_bd_intf_pins easyobv_axis_0/instr] [get_bd_intf_pins traffic_engine_0/instr0]
   connect_bd_intf_net -intf_net traffic_engine_0_m_axi [get_bd_intf_pins memory/S01_AXI] [get_bd_intf_pins traffic_engine_0/m_axi]
@@ -419,8 +419,8 @@ proc create_root_design { parentCell INSTR_BYTES easyobv_config} {
   connect_bd_net -net memory_mem_clk [get_bd_pins memory/mem_clk] [get_bd_pins traffic_engine_0/mem_clk]
   connect_bd_net -net processor_pl_clk0 [get_bd_pins memory/pcie_clk] [get_bd_pins traffic_engine_0/s_axil_aclk] [get_bd_pins xdma/axi_aclk]
   connect_bd_net -net traffic_engine_0_instr0_rst [get_bd_pins dut/rst] [get_bd_pins easyobv_axis_0/rst] [get_bd_pins traffic_engine_0/instr0_rst] [get_bd_pins util_vector_logic/Op1]
-  connect_bd_net -net util_ds_buf_1_BUFG_O [get_bd_pins dut/traffic_clk] [get_bd_pins easyobv_axis_0/clk] [get_bd_pins system_ila_0/clk] [get_bd_pins traffic_engine_0/instr0_clk] [get_bd_pins vio_0/clk]
-  connect_bd_net -net util_vector_logic_Res [get_bd_pins system_ila_0/resetn] [get_bd_pins util_vector_logic/Res]
+  connect_bd_net -net util_ds_buf_1_BUFG_O [get_bd_pins dut/traffic_clk] [get_bd_pins easyobv_axis_0/clk] [get_bd_pins system_ila/clk] [get_bd_pins traffic_engine_0/instr0_clk] [get_bd_pins vio_0/clk]
+  connect_bd_net -net util_vector_logic_Res [get_bd_pins system_ila/resetn] [get_bd_pins util_vector_logic/Res]
   connect_bd_net -net vio_0_probe_out0 [get_bd_pins traffic_engine_0/rst] [get_bd_pins vio_0/probe_out0]
   connect_bd_net -net xdma_axi_aresetn [get_bd_pins memory/pcie_rstn] [get_bd_pins xdma/axi_aresetn]
   connect_bd_net -net xlconstant_0_dout [get_bd_pins const_zero/dout] [get_bd_pins easyobv_axis_0/pause] [get_bd_pins easyobv_axis_0/timeout_clr]
