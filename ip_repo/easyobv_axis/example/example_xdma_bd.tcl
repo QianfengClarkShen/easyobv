@@ -428,7 +428,7 @@ proc create_root_design { parentCell INSTR_BYTES easyobv_config} {
   # Create address segments
   assign_bd_address -offset 0x00000000 -range 0x000400000000 -target_address_space [get_bd_addr_spaces traffic_engine_0/m_axi] [get_bd_addr_segs memory/ddr4_0/C0_DDR4_MEMORY_MAP/C0_DDR4_ADDRESS_BLOCK] -force
   assign_bd_address -offset 0x00000000 -range 0x000400000000 -target_address_space [get_bd_addr_spaces xdma/xdma_0/M_AXI] [get_bd_addr_segs memory/ddr4_0/C0_DDR4_MEMORY_MAP/C0_DDR4_ADDRESS_BLOCK] -force
-  assign_bd_address -offset 0x00000000 -range 0x00010000 -target_address_space [get_bd_addr_spaces xdma/xdma_0/M_AXI_LITE] [get_bd_addr_segs traffic_engine_0/s_axil/reg0] -force
+  assign_bd_address -offset 0x00000000 -range 0x00001000 -target_address_space [get_bd_addr_spaces xdma/xdma_0/M_AXI_LITE] [get_bd_addr_segs traffic_engine_0/s_axil/reg0] -force
 
   # Restore current instance
   current_bd_instance $oldCurInst
