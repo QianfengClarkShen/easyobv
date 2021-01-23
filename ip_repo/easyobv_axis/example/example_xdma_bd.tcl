@@ -420,7 +420,7 @@ proc create_root_design { parentCell INSTR_BYTES easyobv_config} {
 
   # Create port connections
   connect_bd_net -net memory_mem_clk [get_bd_pins memory/mem_clk] [get_bd_pins traffic_engine_0/mem_clk]
-  connect_bd_net -net processor_pl_clk0 [get_bd_pins memory/pcie_clk] [get_bd_pins traffic_engine_0/s_axil_aclk] [get_bd_pins xdma/axi_aclk]
+  connect_bd_net -net xdma_pcie_clk [get_bd_pins memory/pcie_clk] [get_bd_pins traffic_engine_0/s_axil_aclk] [get_bd_pins xdma/axi_aclk]
   connect_bd_net -net traffic_engine_0_instr0_rst [get_bd_pins dut/rst] [get_bd_pins easyobv_axis_0/rst] [get_bd_pins traffic_engine_0/instr0_rst] [get_bd_pins util_vector_logic/Op1]
   connect_bd_net -net util_ds_buf_1_BUFG_O [get_bd_pins dut/traffic_clk] [get_bd_pins easyobv_axis_0/clk] [get_bd_pins system_ila/clk] [get_bd_pins traffic_engine_0/instr0_clk] [get_bd_pins vio_0/clk]
   connect_bd_net -net util_vector_logic_Res [get_bd_pins system_ila/resetn] [get_bd_pins util_vector_logic/Res]

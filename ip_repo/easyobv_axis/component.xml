@@ -543,7 +543,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>c4cd1d49</spirit:value>
+            <spirit:value>aa1e4e2f</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -559,7 +559,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>c4cd1d49</spirit:value>
+            <spirit:value>aa1e4e2f</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -587,7 +587,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>9d232121</spirit:value>
+            <spirit:value>ee2c9584</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -601,7 +601,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>616d3366</spirit:value>
+            <spirit:value>fd16b9be</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -615,7 +615,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>8199a0d4</spirit:value>
+            <spirit:value>df6d6d1d</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -2141,13 +2141,13 @@
       <xilinx:definitionSource>package_project</xilinx:definitionSource>
       <xilinx:vendorDisplayName>clarkshen.com</xilinx:vendorDisplayName>
       <xilinx:coreRevision>2</xilinx:coreRevision>
-      <xilinx:coreCreationDateTime>2021-01-22T23:10:04Z</xilinx:coreCreationDateTime>
+      <xilinx:coreCreationDateTime>2021-01-23T07:58:09Z</xilinx:coreCreationDateTime>
     </xilinx:coreExtensions>
     <xilinx:packagingInfo>
       <xilinx:xilinxVersion>2020.1</xilinx:xilinxVersion>
       <xilinx:checksum xilinx:scope="busInterfaces" xilinx:value="229a1bfc"/>
       <xilinx:checksum xilinx:scope="memoryMaps" xilinx:value="547f63cc"/>
-      <xilinx:checksum xilinx:scope="fileGroups" xilinx:value="5835453a"/>
+      <xilinx:checksum xilinx:scope="fileGroups" xilinx:value="d95dc241"/>
       <xilinx:checksum xilinx:scope="ports" xilinx:value="4336b96c"/>
       <xilinx:checksum xilinx:scope="hdlParameters" xilinx:value="d72518ed"/>
       <xilinx:checksum xilinx:scope="parameters" xilinx:value="252cf548"/>

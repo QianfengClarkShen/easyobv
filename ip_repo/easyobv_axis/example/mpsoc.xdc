@@ -4,15 +4,16 @@
 #set_property IOSTANDARD LVDS_25 [get_ports {traffic_clk_clk_n[0]}]
 #set_property PACKAGE_PIN C4 [get_ports {traffic_clk_clk_p[0]}]
 #set_property PACKAGE_PIN C3 [get_ports {traffic_clk_clk_n[0]}]
+#
 ### DDR CLOCK##############################################
+#set_property PACKAGE_PIN AR27 [get_ports ddr_clk_clk_p]
+#set_property PACKAGE_PIN AT27 [get_ports ddr_clk_clk_n]
 #
 ### DDR4###################################################
 #set_property PROHIBIT true [get_bels IOB_X0Y100/PAD]
 #set_property PROHIBIT true [get_bels IOB_X0Y103/PAD]
 #################################################################
 #
-#set_property PACKAGE_PIN AR27 [get_ports ddr_clk_DS_clk_p]
-#set_property PACKAGE_PIN AT27 [get_ports ddr_clk_DS_clk_n]
 #set_property PACKAGE_PIN AU26 [get_ports C0_DDR4_0_act_n]
 #set_property PACKAGE_PIN AR25 [get_ports {C0_DDR4_0_adr[10]}]
 #set_property PACKAGE_PIN AW26 [get_ports {C0_DDR4_0_adr[11]}]

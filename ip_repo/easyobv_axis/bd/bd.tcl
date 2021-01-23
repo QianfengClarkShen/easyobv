@@ -11,9 +11,9 @@ proc post_config_ip { cell_name args } {
     if {$mode == 0} {
         set_property CONFIG.ASSOCIATED_BUSIF {instr:traffic} [get_bd_pins $cell_name/clk]
     } elseif {$mode == 1} {
-        set_property CONFIG.ASSOCIATED_BUSIF {instr:traffic} [get_bd_pins $cell_name/clk]
+        set_property CONFIG.ASSOCIATED_BUSIF {instr:traffic:dbg} [get_bd_pins $cell_name/clk]
     } else {
-        set_property CONFIG.ASSOCIATED_BUSIF {instr:traffic:rx_mon} [get_bd_pins $cell_name/clk]
+        set_property CONFIG.ASSOCIATED_BUSIF {instr:traffic:dbg:rx_mon} [get_bd_pins $cell_name/clk]
     }
 }
 

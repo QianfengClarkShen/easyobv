@@ -74,3 +74,4 @@ validate_bd_design
 make_wrapper -files [get_files ${project_dir}/${project_name}.srcs/sources_1/bd/easyobv_ex/easyobv_ex.bd] -top
 add_files -norecurse ${project_dir}/${project_name}.srcs/sources_1/bd/easyobv_ex/hdl/easyobv_ex_wrapper.v
 set_property top easyobv_ex_wrapper [current_fileset]
+regenerate_bd_layout
