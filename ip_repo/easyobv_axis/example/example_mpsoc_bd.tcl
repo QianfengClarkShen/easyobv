@@ -1004,7 +1004,7 @@ proc create_root_design { parentCell INSTR_BYTES easyobv_config} {
   # Create instance: dut
   create_hier_cell_dut [current_bd_instance .] dut
 
-  set EN_AXIL [dict get $easyobv_config CONFIG.EN_AXIL
+  set EN_AXIL [dict get $easyobv_config CONFIG.EN_AXIL]
   if {$EN_AXIL == 0} {
     # Create instance: const_zero, and set properties
     set const_zero [ addip xlconstant const_zero ]
