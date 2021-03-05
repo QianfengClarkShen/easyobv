@@ -46,7 +46,6 @@ module mm2s #
     logic [$clog2(BURST_LEN)+1:0] fifo_cnt[N_CHANNELS-1:0];
 
     logic [15:0] m_axi_rready_int;
-    logic [N_CHANNELS-1:0] channel_tvalid_int;
 
     genvar i;
  //mem read control
@@ -126,11 +125,10 @@ module mm2s #
             .s_axis_tvalid (m_axi_rvalid&&(m_axi_rid == i)),
             .s_axis_tready (m_axi_rready_int[i]),
             .m_axis_tdata  (channel_tdata[i]),
-            .m_axis_tvalid (channel_tvalid_int[i]),
+            .m_axis_tvalid (channel_tvalid[i]),
             .m_axis_tready (channel_tready[i]),
             .fifo_cnt      (fifo_cnt[i])
         );
-        assign channel_tvalid[i] = channel_tvalid_int[i];
     end
     for (i = N_CHANNELS; i < 16; i++)
         assign m_axi_rready_int[i] = 1'b1;

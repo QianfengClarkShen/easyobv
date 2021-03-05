@@ -33,6 +33,9 @@
 <:			} else { :>
 <:				set fifo_depth [expr 2*$base_cnt*$seg_width/$bw] :>
 <:			} :>
+<:          if {$fifo_depth < 16} { :>
+<:              set fifo_depth 16   :>
+<:          } :>
 <:			lappend next_state_cycle_idxs [expr $seg_width*$base_cnt/$bw-1] :>
 <:			lappend state_cnt_widths [log2 [expr $seg_width*$base_cnt/$bw]] :>
 <:			lappend state_cnt_widthsm1 [expr [log2 [expr $seg_width*$base_cnt/$bw]]-1] :>
