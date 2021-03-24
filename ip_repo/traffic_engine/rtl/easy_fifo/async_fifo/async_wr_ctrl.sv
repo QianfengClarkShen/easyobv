@@ -10,8 +10,7 @@ module async_wr_ctrl #
     input logic [$clog2(DEPTH):0] rd_ptr_wsync,
     output logic [$clog2(DEPTH)-1:0] wr_addr,
     output logic [$clog2(DEPTH):0] wr_ptr,
-    output logic wr_full,
-	output logic [$clog2(DEPTH):0] fifo_cnt_wr_synced
+    output logic wr_full
 );
     localparam AWIDTH = $clog2(DEPTH);
     logic [AWIDTH:0] wr_ptr_bin;
@@ -38,14 +37,6 @@ module async_wr_ctrl #
     	.gray (wr_ptr),
         .bin  (wr_ptr_bin)
     );
-
-
-	always_ff @(posedge wr_clk) begin
-		if (rst)
-			fifo_cnt_wr_synced <= {($clog2(DEPTH)+1){1'b0}};
-		else
-			fifo_cnt_wr_synced <= wr_ptr_bin - rd_ptr_wsync_bin;
-	end
 
     always_ff @(posedge wr_clk) begin
         if (rst) begin

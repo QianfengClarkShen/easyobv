@@ -22,6 +22,8 @@
 <: set next_state_cycle_idxs [dict get $config_dict next_state_cycle_idxs] :>
 <: set state_cnt_widths [dict get $config_dict state_cnt_widths] :>
 <: set state_cnt_widthsm1 [dict get $config_dict state_cnt_widthsm1] :>
+<: ;#n_flit_mask_bits :>
+<: set N [log2 [expr $MEM_WIDTH/[lindex $seg_widths end]]] :>
 <: } :>
 module decoder<=: $channel_idx :>
 (
@@ -56,13 +58,14 @@ module decoder<=: $channel_idx :>
         .s_axis_tready (mem_tready),
         .m_axis_tdata  (instr_tdata),
         .m_axis_tvalid (instr_tvalid&enable),
-        .m_axis_tready (instr_tready&enable),
-        .fifo_cnt_wr_synced(),
-        .fifo_cnt_rd_synced()
+        .m_axis_tready (instr_tready&enable)
     );
 endmodule
 <: continue :>
 <: } :>
+//invalid flag
+    logic invalid_flag;
+
 //states counters
     logic [<=: $fifo_cntm1 :>:0] state_onehot = <=: $fifo_cnt :>'b<=: [string repeat 0 $fifo_cntm1] :>1;
 <: for {set i 0} {$i < $fifo_cnt} {incr i} { :>
@@ -135,10 +138,24 @@ endmodule
     );
 <: } :>
     always_ff @(posedge m_axis_aclk) begin
-        if (~enable)
-            flitcnt_int <= flitcnt;
-        else if (instr_tready && (&fifo_tvalid) && (flitcnt_int != <=: $ADDR_WIDTH :>'b0))
-            flitcnt_int <= flitcnt_int - 1'b1;
+        if (m_axis_rst)
+            flitcnt_int <= <=: $ADDR_WIDTH :>'b0;
+        else if (instr_tready & enable & (&fifo_tvalid)) begin
+            if ((flitcnt_int + 1'b1) == {flitcnt[<=: [expr $ADDR_WIDTH-1] :>:<=: $N :>]+{|flitcnt[<=: [expr $N-1] :>:0]},<=: $N :>'b0})
+                flitcnt_int <= <=: $ADDR_WIDTH :>'b0;
+            else
+                flitcnt_int <= flitcnt_int + 1'b1;
+        end
+    end
+    always_ff @(posedge m_axis_aclk) begin
+        if (m_axis_rst)
+            invalid_flag <= 1'b0;
+        else if (instr_tready & enable & (&fifo_tvalid)) begin
+            if ((flitcnt_int + 1'b1) == {flitcnt[<=: [expr $ADDR_WIDTH-1] :>:<=: $N :>]+{|flitcnt[<=: [expr $N-1] :>:0]},<=: $N :>'b0})
+                invalid_flag <= 1'b0;
+            else if ((flitcnt_int + 1'b1) == flitcnt)
+                invalid_flag <= 1'b1;
+        end
     end
 
     assign mem_tready = |(state_onehot&fifo_tready);
@@ -153,6 +170,6 @@ endmodule
 <:  } :>
 <:  set curr_idx_low [expr $curr_idx_high+1] :>
 <: } :>
-    assign instr_tvalid = (&fifo_tvalid) && enable && (flitcnt_int != <=: $ADDR_WIDTH :>'b0);
+    assign instr_tvalid = (&fifo_tvalid) & enable & ~invalid_flag;
 endmodule
 <: } :>

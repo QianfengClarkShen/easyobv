@@ -15,9 +15,7 @@ module async_fifo #
     input logic [DWIDTH-1:0] wr_data,
     output logic wr_full,
     output logic [DWIDTH-1:0] rd_data,
-    output logic rd_empty,
-	output logic [$clog2(DEPTH):0] fifo_cnt_wr_synced,
-	output logic [$clog2(DEPTH):0] fifo_cnt_rd_synced
+    output logic rd_empty
 );
     logic [$clog2(DEPTH)-1:0] wr_addr, rd_addr;
     logic [$clog2(DEPTH):0] wr_ptr, rd_ptr, wr_ptr_rsync, rd_ptr_wsync;

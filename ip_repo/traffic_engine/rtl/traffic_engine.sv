@@ -151,9 +151,11 @@ module traffic_engine # (
 
 //axilite
     //to mm2s
+    logic reset_axil;
     logic core_ready_axil, mm2s_start_axil;
     logic [63:0] rd_addr_axil[15:0];
     logic [63:0] rd_size_axil[15:0];
+    logic [31:0] repeat_cnt_axil;
     //to decoder
     logic [15:0] channel_en_axil;
     logic [63:0] flitcnt_axil[15:0];
@@ -163,6 +165,7 @@ module traffic_engine # (
     logic [ADDR_WIDTH-1:0] rd_addr[N_CHANNELS-1:0];
     logic [ADDR_WIDTH-1:0] rd_size[N_CHANNELS-1:0];
     logic [ADDR_WIDTH-1:0] flitcnt[N_CHANNELS-1:0];
+    logic [31:0] repeat_cnt;
     //to decoder
     logic [MEM_WIDTH-1:0] channel_tdata[N_CHANNELS-1:0];
     logic [N_CHANNELS-1:0] channel_tvalid;

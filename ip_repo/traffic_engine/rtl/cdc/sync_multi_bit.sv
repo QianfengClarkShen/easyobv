@@ -42,6 +42,7 @@ module sync_multi_bit #
     sync_signle_bit #(
         .N_STAGE   (N_STAGE)
     ) sync_wr (
+        .clk_in  (1'b0),
     	.clk_out (clk_out),
         .rst     (rst),
         .din     (wr_flag),
@@ -50,6 +51,7 @@ module sync_multi_bit #
     sync_signle_bit #(
         .N_STAGE   (N_STAGE)
     ) sync_rd (
+        .clk_in  (1'b0),
     	.clk_out (clk_in),
         .rst     (rst),
         .din     (rd_flag),

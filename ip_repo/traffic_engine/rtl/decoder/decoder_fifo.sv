@@ -49,9 +49,7 @@ if (DWIDTH_IN < DWIDTH_OUT) begin
         .*,
         .s_axis_tdata  (fifo_tdata),
         .s_axis_tvalid (fifo_tvalid),
-        .s_axis_tready (fifo_tready),
-        .fifo_cnt_wr_synced(),
-        .fifo_cnt_rd_synced()
+        .s_axis_tready (fifo_tready)
     );
     
     assign fifo_tdata = {s_axis_tdata,input_reg[DWIDTH_OUT-1:DWIDTH_IN]};
@@ -64,11 +62,7 @@ else if (DWIDTH_IN == DWIDTH_OUT) begin
         .DEPTH      (DEPTH),
         .INPUT_REG  (1),
         .OUTPUT_REG (1)
-    ) u_easy_fifo_axis_async(
-        .*,
-        .fifo_cnt_wr_synced(),
-        .fifo_cnt_rd_synced()
-    );
+    ) u_easy_fifo_axis_async(.*);
 end
 else begin
     localparam int RATIO = DWIDTH_IN/DWIDTH_OUT;
@@ -90,9 +84,7 @@ else begin
         .*,
         .m_axis_tdata  (fifo_tdata),
         .m_axis_tvalid (fifo_tvalid),
-        .m_axis_tready (fifo_tready),
-        .fifo_cnt_wr_synced(),
-        .fifo_cnt_rd_synced()
+        .m_axis_tready (fifo_tready)
     );
     always_ff @(posedge m_axis_aclk) begin
         if (m_axis_rst) begin

@@ -14,8 +14,7 @@ module easy_fifo_axis_sync #
     output logic s_axis_tready,
     output logic [DWIDTH-1:0] m_axis_tdata,
     output logic m_axis_tvalid,
-    input logic m_axis_tready,
-	output logic [$clog2(DEPTH):0] fifo_cnt
+    input logic m_axis_tready
 );
 //internal clocks
     logic wr_clk_int, rd_clk_int;
@@ -76,8 +75,7 @@ module easy_fifo_axis_sync #
         .rd_en    (rd_en_int),
         .rd_data  (rd_data_int),
         .wr_full  (wr_full_int),
-        .rd_empty (rd_empty_int),
-		.fifo_cnt (fifo_cnt)
+        .rd_empty (rd_empty_int)
     );
 
 endmodule
