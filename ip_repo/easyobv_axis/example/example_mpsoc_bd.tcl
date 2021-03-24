@@ -1064,7 +1064,7 @@ proc create_root_design { parentCell INSTR_BYTES easyobv_config} {
   connect_bd_net -net util_ds_buf_1_BUFG_O [get_bd_pins dut/traffic_clk] [get_bd_pins easyobv_axis_0/clk] [get_bd_pins traffic_engine_0/instr0_clk] [get_bd_pins vio_0/clk]
   connect_bd_net -net vio_0_probe_out0 [get_bd_pins traffic_engine_0/rst] [get_bd_pins vio_0/probe_out0]
   if {$EN_AXIL == 0} {
-    connect_bd_net -net xlconstant_0_dout [get_bd_pins const_zero/dout] [get_bd_pins easyobv_axis_0/pause] [get_bd_pins easyobv_axis_0/timeout_clr]
+    connect_bd_net -net xlconstant_0_dout [get_bd_pins const_zero/dout] [get_bd_pins easyobv_axis_0/pause] [get_bd_pins easyobv_axis_0/clear]
   }
   connect_bd_net [get_bd_pins system_ila/clk] [get_bd_pins dut/traffic_clk]
   connect_bd_net [get_bd_pins util_vector_logic/Op1] [get_bd_pins traffic_engine_0/instr0_rst]

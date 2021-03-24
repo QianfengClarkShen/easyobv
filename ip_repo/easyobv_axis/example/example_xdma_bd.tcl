@@ -427,7 +427,7 @@ proc create_root_design { parentCell INSTR_BYTES easyobv_config} {
   connect_bd_net -net vio_0_probe_out0 [get_bd_pins traffic_engine_0/rst] [get_bd_pins vio_0/probe_out0]
   connect_bd_net -net xdma_axi_aresetn [get_bd_pins memory/pcie_rstn] [get_bd_pins xdma/axi_aresetn]
   if {$EN_AXIL == 0} {
-    connect_bd_net -net xlconstant_0_dout [get_bd_pins const_zero/dout] [get_bd_pins easyobv_axis_0/pause] [get_bd_pins easyobv_axis_0/timeout_clr]
+    connect_bd_net -net xlconstant_0_dout [get_bd_pins const_zero/dout] [get_bd_pins easyobv_axis_0/pause] [get_bd_pins easyobv_axis_0/clear]
   }
 
   # Create address segments

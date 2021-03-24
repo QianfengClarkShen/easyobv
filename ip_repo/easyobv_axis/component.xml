@@ -41,7 +41,7 @@
       <spirit:name>rx_mon</spirit:name>
       <spirit:busType spirit:vendor="xilinx.com" spirit:library="interface" spirit:name="axis" spirit:version="1.0"/>
       <spirit:abstractionType spirit:vendor="xilinx.com" spirit:library="interface" spirit:name="axis_rtl" spirit:version="1.0"/>
-      <spirit:slave/>
+      <spirit:monitor spirit:interfaceMode="slave"/>
       <spirit:portMaps>
         <spirit:portMap>
           <spirit:logicalPort>
@@ -429,10 +429,10 @@
       <spirit:portMaps>
         <spirit:portMap>
           <spirit:logicalPort>
-            <spirit:name>mismatch_cnt</spirit:name>
+            <spirit:name>mismatch</spirit:name>
           </spirit:logicalPort>
           <spirit:physicalPort>
-            <spirit:name>mismatch_cnt</spirit:name>
+            <spirit:name>mismatch</spirit:name>
           </spirit:physicalPort>
         </spirit:portMap>
         <spirit:portMap>
@@ -453,18 +453,10 @@
         </spirit:portMap>
         <spirit:portMap>
           <spirit:logicalPort>
-            <spirit:name>tx_pkt_time_cnt</spirit:name>
+            <spirit:name>tx_time_elapsed</spirit:name>
           </spirit:logicalPort>
           <spirit:physicalPort>
-            <spirit:name>tx_pkt_time_cnt</spirit:name>
-          </spirit:physicalPort>
-        </spirit:portMap>
-        <spirit:portMap>
-          <spirit:logicalPort>
-            <spirit:name>tx_pkt_timestamp_sum</spirit:name>
-          </spirit:logicalPort>
-          <spirit:physicalPort>
-            <spirit:name>tx_pkt_timestamp_sum</spirit:name>
+            <spirit:name>tx_time_elapsed</spirit:name>
           </spirit:physicalPort>
         </spirit:portMap>
         <spirit:portMap>
@@ -485,18 +477,10 @@
         </spirit:portMap>
         <spirit:portMap>
           <spirit:logicalPort>
-            <spirit:name>rx_pkt_time_cnt</spirit:name>
+            <spirit:name>rx_time_elapsed</spirit:name>
           </spirit:logicalPort>
           <spirit:physicalPort>
-            <spirit:name>rx_pkt_time_cnt</spirit:name>
-          </spirit:physicalPort>
-        </spirit:portMap>
-        <spirit:portMap>
-          <spirit:logicalPort>
-            <spirit:name>rx_pkt_timestamp_sum</spirit:name>
-          </spirit:logicalPort>
-          <spirit:physicalPort>
-            <spirit:name>rx_pkt_timestamp_sum</spirit:name>
+            <spirit:name>rx_time_elapsed</spirit:name>
           </spirit:physicalPort>
         </spirit:portMap>
         <spirit:portMap>
@@ -505,6 +489,14 @@
           </spirit:logicalPort>
           <spirit:physicalPort>
             <spirit:name>rx_transferred_size</spirit:name>
+          </spirit:physicalPort>
+        </spirit:portMap>
+        <spirit:portMap>
+          <spirit:logicalPort>
+            <spirit:name>latency_sum</spirit:name>
+          </spirit:logicalPort>
+          <spirit:physicalPort>
+            <spirit:name>latency_sum</spirit:name>
           </spirit:physicalPort>
         </spirit:portMap>
       </spirit:portMaps>
@@ -543,7 +535,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>aa1e4e2f</spirit:value>
+            <spirit:value>1bf67c51</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -559,7 +551,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>aa1e4e2f</spirit:value>
+            <spirit:value>1bf67c51</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -573,7 +565,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>d2c95e67</spirit:value>
+            <spirit:value>f9f856d3</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -587,7 +579,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>ee2c9584</spirit:value>
+            <spirit:value>3e8a681e</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -601,7 +593,7 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>viewChecksum</spirit:name>
-            <spirit:value>d35c583a</spirit:value>
+            <spirit:value>f8753070</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -974,7 +966,7 @@
         </spirit:vendorExtensions>
       </spirit:port>
       <spirit:port>
-        <spirit:name>timeout_clr</spirit:name>
+        <spirit:name>clear</spirit:name>
         <spirit:wire>
           <spirit:direction>in</spirit:direction>
           <spirit:wireTypeDefs>
@@ -991,7 +983,7 @@
         <spirit:vendorExtensions>
           <xilinx:portInfo>
             <xilinx:enablement>
-              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.timeout_clr" xilinx:dependency="$EN_AXIL = 0">false</xilinx:isEnabled>
+              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.clear" xilinx:dependency="$EN_AXIL = 0">false</xilinx:isEnabled>
             </xilinx:enablement>
           </xilinx:portInfo>
         </spirit:vendorExtensions>
@@ -1284,7 +1276,7 @@
       <spirit:port>
         <spirit:name>rx_mon_tready</spirit:name>
         <spirit:wire>
-          <spirit:direction>out</spirit:direction>
+          <spirit:direction>in</spirit:direction>
           <spirit:wireTypeDefs>
             <spirit:wireTypeDef>
               <spirit:typeName>logic</spirit:typeName>
@@ -1292,6 +1284,9 @@
               <spirit:viewNameRef>xilinx_anylanguagebehavioralsimulation</spirit:viewNameRef>
             </spirit:wireTypeDef>
           </spirit:wireTypeDefs>
+          <spirit:driver>
+            <spirit:defaultValue spirit:format="long">1</spirit:defaultValue>
+          </spirit:driver>
         </spirit:wire>
       </spirit:port>
       <spirit:port>
@@ -1453,13 +1448,9 @@
         </spirit:vendorExtensions>
       </spirit:port>
       <spirit:port>
-        <spirit:name>mismatch_cnt</spirit:name>
+        <spirit:name>mismatch</spirit:name>
         <spirit:wire>
           <spirit:direction>out</spirit:direction>
-          <spirit:vector>
-            <spirit:left spirit:format="long">63</spirit:left>
-            <spirit:right spirit:format="long">0</spirit:right>
-          </spirit:vector>
           <spirit:wireTypeDefs>
             <spirit:wireTypeDef>
               <spirit:typeName>logic</spirit:typeName>
@@ -1474,7 +1465,7 @@
         <spirit:vendorExtensions>
           <xilinx:portInfo>
             <xilinx:enablement>
-              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.mismatch_cnt" xilinx:dependency="$MODE = 2">false</xilinx:isEnabled>
+              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.mismatch" xilinx:dependency="$MODE = 2">false</xilinx:isEnabled>
             </xilinx:enablement>
           </xilinx:portInfo>
         </spirit:vendorExtensions>
@@ -1534,7 +1525,7 @@
         </spirit:vendorExtensions>
       </spirit:port>
       <spirit:port>
-        <spirit:name>tx_pkt_time_cnt</spirit:name>
+        <spirit:name>tx_time_elapsed</spirit:name>
         <spirit:wire>
           <spirit:direction>out</spirit:direction>
           <spirit:vector>
@@ -1555,34 +1546,7 @@
         <spirit:vendorExtensions>
           <xilinx:portInfo>
             <xilinx:enablement>
-              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.tx_pkt_time_cnt" xilinx:dependency="$MODE > 0">false</xilinx:isEnabled>
-            </xilinx:enablement>
-          </xilinx:portInfo>
-        </spirit:vendorExtensions>
-      </spirit:port>
-      <spirit:port>
-        <spirit:name>tx_pkt_timestamp_sum</spirit:name>
-        <spirit:wire>
-          <spirit:direction>out</spirit:direction>
-          <spirit:vector>
-            <spirit:left spirit:format="long">63</spirit:left>
-            <spirit:right spirit:format="long">0</spirit:right>
-          </spirit:vector>
-          <spirit:wireTypeDefs>
-            <spirit:wireTypeDef>
-              <spirit:typeName>logic</spirit:typeName>
-              <spirit:viewNameRef>xilinx_anylanguagesynthesis</spirit:viewNameRef>
-              <spirit:viewNameRef>xilinx_anylanguagebehavioralsimulation</spirit:viewNameRef>
-            </spirit:wireTypeDef>
-          </spirit:wireTypeDefs>
-          <spirit:driver>
-            <spirit:defaultValue spirit:format="long">0</spirit:defaultValue>
-          </spirit:driver>
-        </spirit:wire>
-        <spirit:vendorExtensions>
-          <xilinx:portInfo>
-            <xilinx:enablement>
-              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.tx_pkt_timestamp_sum" xilinx:dependency="$MODE > 0">false</xilinx:isEnabled>
+              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.tx_time_elapsed" xilinx:dependency="$MODE > 0">false</xilinx:isEnabled>
             </xilinx:enablement>
           </xilinx:portInfo>
         </spirit:vendorExtensions>
@@ -1642,7 +1606,7 @@
         </spirit:vendorExtensions>
       </spirit:port>
       <spirit:port>
-        <spirit:name>rx_pkt_time_cnt</spirit:name>
+        <spirit:name>rx_time_elapsed</spirit:name>
         <spirit:wire>
           <spirit:direction>out</spirit:direction>
           <spirit:vector>
@@ -1663,34 +1627,7 @@
         <spirit:vendorExtensions>
           <xilinx:portInfo>
             <xilinx:enablement>
-              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.rx_pkt_time_cnt" xilinx:dependency="$MODE = 2">false</xilinx:isEnabled>
-            </xilinx:enablement>
-          </xilinx:portInfo>
-        </spirit:vendorExtensions>
-      </spirit:port>
-      <spirit:port>
-        <spirit:name>rx_pkt_timestamp_sum</spirit:name>
-        <spirit:wire>
-          <spirit:direction>out</spirit:direction>
-          <spirit:vector>
-            <spirit:left spirit:format="long">63</spirit:left>
-            <spirit:right spirit:format="long">0</spirit:right>
-          </spirit:vector>
-          <spirit:wireTypeDefs>
-            <spirit:wireTypeDef>
-              <spirit:typeName>logic</spirit:typeName>
-              <spirit:viewNameRef>xilinx_anylanguagesynthesis</spirit:viewNameRef>
-              <spirit:viewNameRef>xilinx_anylanguagebehavioralsimulation</spirit:viewNameRef>
-            </spirit:wireTypeDef>
-          </spirit:wireTypeDefs>
-          <spirit:driver>
-            <spirit:defaultValue spirit:format="long">0</spirit:defaultValue>
-          </spirit:driver>
-        </spirit:wire>
-        <spirit:vendorExtensions>
-          <xilinx:portInfo>
-            <xilinx:enablement>
-              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.rx_pkt_timestamp_sum" xilinx:dependency="$MODE = 2">false</xilinx:isEnabled>
+              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.rx_time_elapsed" xilinx:dependency="$MODE = 2">false</xilinx:isEnabled>
             </xilinx:enablement>
           </xilinx:portInfo>
         </spirit:vendorExtensions>
@@ -1721,6 +1658,23 @@
             </xilinx:enablement>
           </xilinx:portInfo>
         </spirit:vendorExtensions>
+      </spirit:port>
+      <spirit:port>
+        <spirit:name>latency_sum</spirit:name>
+        <spirit:wire>
+          <spirit:direction>out</spirit:direction>
+          <spirit:vector>
+            <spirit:left spirit:format="long">63</spirit:left>
+            <spirit:right spirit:format="long">0</spirit:right>
+          </spirit:vector>
+          <spirit:wireTypeDefs>
+            <spirit:wireTypeDef>
+              <spirit:typeName>logic</spirit:typeName>
+              <spirit:viewNameRef>xilinx_anylanguagesynthesis</spirit:viewNameRef>
+              <spirit:viewNameRef>xilinx_anylanguagebehavioralsimulation</spirit:viewNameRef>
+            </spirit:wireTypeDef>
+          </spirit:wireTypeDefs>
+        </spirit:wire>
       </spirit:port>
     </spirit:ports>
     <spirit:modelParameters>
@@ -1811,6 +1765,11 @@
           </xilinx:parameterInfo>
         </spirit:vendorExtensions>
       </spirit:modelParameter>
+      <spirit:modelParameter spirit:dataType="int">
+        <spirit:name>CLK_FREQ</spirit:name>
+        <spirit:displayName>Clk Freq</spirit:displayName>
+        <spirit:value spirit:format="long" spirit:resolve="generated" spirit:id="MODELPARAM_VALUE.CLK_FREQ">100000000</spirit:value>
+      </spirit:modelParameter>
     </spirit:modelParameters>
   </spirit:model>
   <spirit:choices>
@@ -1890,7 +1849,7 @@
       <spirit:file>
         <spirit:name>rtl/cdc/sync_single_bit.sv</spirit:name>
         <spirit:fileType>systemVerilogSource</spirit:fileType>
-        <spirit:userFileType>CHECKSUM_525616b8</spirit:userFileType>
+        <spirit:userFileType>CHECKSUM_a363e180</spirit:userFileType>
       </spirit:file>
       <spirit:file>
         <spirit:name>ttcl/xdc.ttcl</spirit:name>
@@ -1949,7 +1908,7 @@
       <spirit:file>
         <spirit:name>xgui/easyobv_axis_v1_0.tcl</spirit:name>
         <spirit:fileType>tclSource</spirit:fileType>
-        <spirit:userFileType>CHECKSUM_d2c95e67</spirit:userFileType>
+        <spirit:userFileType>CHECKSUM_f9f856d3</spirit:userFileType>
         <spirit:userFileType>XGUI_VERSION_2</spirit:userFileType>
       </spirit:file>
     </spirit:fileSet>
@@ -2098,6 +2057,11 @@
       </spirit:vendorExtensions>
     </spirit:parameter>
     <spirit:parameter>
+      <spirit:name>CLK_FREQ</spirit:name>
+      <spirit:displayName>Clk Freq</spirit:displayName>
+      <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.CLK_FREQ">100000000</spirit:value>
+    </spirit:parameter>
+    <spirit:parameter>
       <spirit:name>Component_Name</spirit:name>
       <spirit:value spirit:resolve="user" spirit:id="PARAM_VALUE.Component_Name" spirit:order="1">easyobv_axis_v1_0</spirit:value>
     </spirit:parameter>
@@ -2141,16 +2105,16 @@
       <xilinx:definitionSource>package_project</xilinx:definitionSource>
       <xilinx:vendorDisplayName>clarkshen.com</xilinx:vendorDisplayName>
       <xilinx:coreRevision>2</xilinx:coreRevision>
-      <xilinx:coreCreationDateTime>2021-02-02T23:03:31Z</xilinx:coreCreationDateTime>
+      <xilinx:coreCreationDateTime>2021-03-22T14:07:31Z</xilinx:coreCreationDateTime>
     </xilinx:coreExtensions>
     <xilinx:packagingInfo>
       <xilinx:xilinxVersion>2020.1</xilinx:xilinxVersion>
-      <xilinx:checksum xilinx:scope="busInterfaces" xilinx:value="229a1bfc"/>
+      <xilinx:checksum xilinx:scope="busInterfaces" xilinx:value="8b9462e9"/>
       <xilinx:checksum xilinx:scope="memoryMaps" xilinx:value="547f63cc"/>
-      <xilinx:checksum xilinx:scope="fileGroups" xilinx:value="63bd29b3"/>
-      <xilinx:checksum xilinx:scope="ports" xilinx:value="4336b96c"/>
-      <xilinx:checksum xilinx:scope="hdlParameters" xilinx:value="d72518ed"/>
-      <xilinx:checksum xilinx:scope="parameters" xilinx:value="252cf548"/>
+      <xilinx:checksum xilinx:scope="fileGroups" xilinx:value="45c5c1ca"/>
+      <xilinx:checksum xilinx:scope="ports" xilinx:value="d39f5356"/>
+      <xilinx:checksum xilinx:scope="hdlParameters" xilinx:value="300817df"/>
+      <xilinx:checksum xilinx:scope="parameters" xilinx:value="df675662"/>
     </xilinx:packagingInfo>
   </spirit:vendorExtensions>
 </spirit:component>

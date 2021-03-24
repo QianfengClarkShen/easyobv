@@ -17,4 +17,9 @@ proc post_config_ip { cell_name args } {
     }
 }
 
-proc propagate { cell_name prop_info } {}
+proc propagate { cell_name prop_info } {
+    set ip [get_bd_cells $cell_name]
+    set clk_freq [get_property CONFIG.FREQ_HZ [get_bd_pins $cell_name/clk]]
+    set_property CONFIG.CLK_FREQ.VALUE_SRC DEFAULT $ip
+    set_property CONFIG.CLK_FREQ $clk_freq $ip
+}

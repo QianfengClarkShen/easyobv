@@ -2,109 +2,103 @@
 module axil
 (
 //user
-	output logic pause_axil,
-	output logic timeout_clr_axil,
-	input logic timeout_axil,
-	input logic loopback_axil,
-	input logic [63:0] mismatch_cnt_axil,
-	input logic [63:0] tx_pkt_cnt_axil,
-	input logic [63:0] tx_pkt_time_cnt_axil,
-	input logic [63:0] tx_pkt_timestamp_sum_axil,
-	input logic [63:0] tx_transferred_size_axil,
-	input logic [63:0] rx_pkt_cnt_axil,
-	input logic [63:0] rx_pkt_time_cnt_axil,
-	input logic [63:0] rx_pkt_timestamp_sum_axil,
-	input logic [63:0] rx_transferred_size_axil,
+    output logic pause_axil,
+    output logic clear_axil,
+    input logic timeout_axil,
+    input logic loopback_axil,
+    input logic mismatch_axil,
+    input logic [31:0] freq_axil,
+    input logic [63:0] tx_pkt_cnt_axil,
+    input logic [63:0] tx_time_elapsed_axil,
+    input logic [63:0] tx_transferred_size_axil,
+    input logic [63:0] rx_pkt_cnt_axil,
+    input logic [63:0] rx_time_elapsed_axil,
+    input logic [63:0] rx_transferred_size_axil,
+    input logic [63:0] latency_sum_axil,
 //axi lite
-    input logic			clk,
-    input logic			rst,
+    input logic         clk,
+    input logic         rst,
     input logic [6:0]   s_axil_awaddr,
-    input logic			s_axil_awvalid,
-    output logic		s_axil_awready,
+    input logic         s_axil_awvalid,
+    output logic        s_axil_awready,
     input logic [31:0]  s_axil_wdata,
     input logic [3:0]   s_axil_wstrb,
     input logic         s_axil_wvalid,
     output logic        s_axil_wready,
     output logic [1:0]  s_axil_bresp,
-    output logic		s_axil_bvalid,
+    output logic        s_axil_bvalid,
     input logic         s_axil_bready,
     input logic [6:0]   s_axil_araddr,
     input logic         s_axil_arvalid,
     output logic        s_axil_arready,
     output logic [31:0] s_axil_rdata,
     output logic [1:0]  s_axil_rresp,
-    output logic		s_axil_rvalid,
+    output logic        s_axil_rvalid,
     input logic         s_axil_rready
 );
 //------------------------Address Info-------------------
 // 0x0 : Data signal of pause_axil
-//	bit 0->0 - pause_axil (READ/WRITE)
-// 0x4 : Data signal of timeout_clr_axil
-//	bit 0->0 - timeout_clr_axil (READ/WRITE)
+//    bit 0->0 - pause_axil (READ/WRITE)
+// 0x4 : Data signal of clear_axil
+//    bit 0->0 - clear_axil (READ/WRITE)
 // 0x8 : Data signal of timeout_axil
-//	bit 0->0 - timeout_axil (READ)
+//    bit 0->0 - timeout_axil (READ)
 // 0xc : Data signal of loopback_axil
-//	bit 0->0 - loopback_axil (READ)
-// 0x10 : Data signal of mismatch_cnt_axil
-//	bit 31->0 - mismatch_cnt_axil[31:0] (READ)
-// 0x14 : Data signal of mismatch_cnt_axil
-//	bit 31->0 - mismatch_cnt_axil[63:32] (READ)
+//    bit 0->0 - loopback_axil (READ)
+// 0x10 : Data signal of mismatch_axil
+//    bit 0->0 - mismatch_axil (READ)
+// 0x14 : Data signal of freq_axil
+//    bit 31->0 - freq_axil[31:0] (READ)
 // 0x18 : Data signal of tx_pkt_cnt_axil
-//	bit 31->0 - tx_pkt_cnt_axil[31:0] (READ)
+//    bit 31->0 - tx_pkt_cnt_axil[31:0] (READ)
 // 0x1c : Data signal of tx_pkt_cnt_axil
-//	bit 31->0 - tx_pkt_cnt_axil[63:32] (READ)
-// 0x20 : Data signal of tx_pkt_time_cnt_axil
-//	bit 31->0 - tx_pkt_time_cnt_axil[31:0] (READ)
-// 0x24 : Data signal of tx_pkt_time_cnt_axil
-//	bit 31->0 - tx_pkt_time_cnt_axil[63:32] (READ)
-// 0x28 : Data signal of tx_pkt_timestamp_sum_axil
-//	bit 31->0 - tx_pkt_timestamp_sum_axil[31:0] (READ)
-// 0x2c : Data signal of tx_pkt_timestamp_sum_axil
-//	bit 31->0 - tx_pkt_timestamp_sum_axil[63:32] (READ)
-// 0x30 : Data signal of tx_transferred_size_axil
-//	bit 31->0 - tx_transferred_size_axil[31:0] (READ)
-// 0x34 : Data signal of tx_transferred_size_axil
-//	bit 31->0 - tx_transferred_size_axil[63:32] (READ)
-// 0x38 : Data signal of rx_pkt_cnt_axil
-//	bit 31->0 - rx_pkt_cnt_axil[31:0] (READ)
-// 0x3c : Data signal of rx_pkt_cnt_axil
-//	bit 31->0 - rx_pkt_cnt_axil[63:32] (READ)
-// 0x40 : Data signal of rx_pkt_time_cnt_axil
-//	bit 31->0 - rx_pkt_time_cnt_axil[31:0] (READ)
-// 0x44 : Data signal of rx_pkt_time_cnt_axil
-//	bit 31->0 - rx_pkt_time_cnt_axil[63:32] (READ)
-// 0x48 : Data signal of rx_pkt_timestamp_sum_axil
-//	bit 31->0 - rx_pkt_timestamp_sum_axil[31:0] (READ)
-// 0x4c : Data signal of rx_pkt_timestamp_sum_axil
-//	bit 31->0 - rx_pkt_timestamp_sum_axil[63:32] (READ)
-// 0x50 : Data signal of rx_transferred_size_axil
-//	bit 31->0 - rx_transferred_size_axil[31:0] (READ)
-// 0x54 : Data signal of rx_transferred_size_axil
-//	bit 31->0 - rx_transferred_size_axil[63:32] (READ)
+//    bit 31->0 - tx_pkt_cnt_axil[63:32] (READ)
+// 0x20 : Data signal of tx_time_elapsed_axil
+//    bit 31->0 - tx_time_elapsed_axil[31:0] (READ)
+// 0x24 : Data signal of tx_time_elapsed_axil
+//    bit 31->0 - tx_time_elapsed_axil[63:32] (READ)
+// 0x28 : Data signal of tx_transferred_size_axil
+//    bit 31->0 - tx_transferred_size_axil[31:0] (READ)
+// 0x2c : Data signal of tx_transferred_size_axil
+//    bit 31->0 - tx_transferred_size_axil[63:32] (READ)
+// 0x30 : Data signal of rx_pkt_cnt_axil
+//    bit 31->0 - rx_pkt_cnt_axil[31:0] (READ)
+// 0x34 : Data signal of rx_pkt_cnt_axil
+//    bit 31->0 - rx_pkt_cnt_axil[63:32] (READ)
+// 0x38 : Data signal of rx_time_elapsed_axil
+//    bit 31->0 - rx_time_elapsed_axil[31:0] (READ)
+// 0x3c : Data signal of rx_time_elapsed_axil
+//    bit 31->0 - rx_time_elapsed_axil[63:32] (READ)
+// 0x40 : Data signal of rx_transferred_size_axil
+//    bit 31->0 - rx_transferred_size_axil[31:0] (READ)
+// 0x44 : Data signal of rx_transferred_size_axil
+//    bit 31->0 - rx_transferred_size_axil[63:32] (READ)
+// 0x48 : Data signal of latency_sum_axil
+//    bit 31->0 - latency_sum_axil[31:0] (READ)
+// 0x4c : Data signal of latency_sum_axil
+//    bit 31->0 - latency_sum_axil[63:32] (READ)
 //------------------------Parameter----------------------
-	localparam bit [6:0] PAUSE_AXIL_ADDR_0 = 7'd0;
-	localparam bit [6:0] TIMEOUT_CLR_AXIL_ADDR_0 = 7'd4;
-	localparam bit [6:0] TIMEOUT_AXIL_ADDR_0 = 7'd8;
-	localparam bit [6:0] LOOPBACK_AXIL_ADDR_0 = 7'd12;
-	localparam bit [6:0] MISMATCH_CNT_AXIL_ADDR_0 = 7'd16;
-	localparam bit [6:0] MISMATCH_CNT_AXIL_ADDR_1 = 7'd20;
-	localparam bit [6:0] TX_PKT_CNT_AXIL_ADDR_0 = 7'd24;
-	localparam bit [6:0] TX_PKT_CNT_AXIL_ADDR_1 = 7'd28;
-	localparam bit [6:0] TX_PKT_TIME_CNT_AXIL_ADDR_0 = 7'd32;
-	localparam bit [6:0] TX_PKT_TIME_CNT_AXIL_ADDR_1 = 7'd36;
-	localparam bit [6:0] TX_PKT_TIMESTAMP_SUM_AXIL_ADDR_0 = 7'd40;
-	localparam bit [6:0] TX_PKT_TIMESTAMP_SUM_AXIL_ADDR_1 = 7'd44;
-	localparam bit [6:0] TX_TRANSFERRED_SIZE_AXIL_ADDR_0 = 7'd48;
-	localparam bit [6:0] TX_TRANSFERRED_SIZE_AXIL_ADDR_1 = 7'd52;
-	localparam bit [6:0] RX_PKT_CNT_AXIL_ADDR_0 = 7'd56;
-	localparam bit [6:0] RX_PKT_CNT_AXIL_ADDR_1 = 7'd60;
-	localparam bit [6:0] RX_PKT_TIME_CNT_AXIL_ADDR_0 = 7'd64;
-	localparam bit [6:0] RX_PKT_TIME_CNT_AXIL_ADDR_1 = 7'd68;
-	localparam bit [6:0] RX_PKT_TIMESTAMP_SUM_AXIL_ADDR_0 = 7'd72;
-	localparam bit [6:0] RX_PKT_TIMESTAMP_SUM_AXIL_ADDR_1 = 7'd76;
-	localparam bit [6:0] RX_TRANSFERRED_SIZE_AXIL_ADDR_0 = 7'd80;
-	localparam bit [6:0] RX_TRANSFERRED_SIZE_AXIL_ADDR_1 = 7'd84;
-	localparam int ADDR_BITS = 7;
+    localparam bit [6:0] PAUSE_AXIL_ADDR_0 = 7'd0;
+    localparam bit [6:0] CLEAR_AXIL_ADDR_0 = 7'd4;
+    localparam bit [6:0] TIMEOUT_AXIL_ADDR_0 = 7'd8;
+    localparam bit [6:0] LOOPBACK_AXIL_ADDR_0 = 7'd12;
+    localparam bit [6:0] MISMATCH_AXIL_ADDR_0 = 7'd16;
+    localparam bit [6:0] FREQ_AXIL_ADDR_0 = 7'd20;
+    localparam bit [6:0] TX_PKT_CNT_AXIL_ADDR_0 = 7'd24;
+    localparam bit [6:0] TX_PKT_CNT_AXIL_ADDR_1 = 7'd28;
+    localparam bit [6:0] TX_TIME_ELAPSED_AXIL_ADDR_0 = 7'd32;
+    localparam bit [6:0] TX_TIME_ELAPSED_AXIL_ADDR_1 = 7'd36;
+    localparam bit [6:0] TX_TRANSFERRED_SIZE_AXIL_ADDR_0 = 7'd40;
+    localparam bit [6:0] TX_TRANSFERRED_SIZE_AXIL_ADDR_1 = 7'd44;
+    localparam bit [6:0] RX_PKT_CNT_AXIL_ADDR_0 = 7'd48;
+    localparam bit [6:0] RX_PKT_CNT_AXIL_ADDR_1 = 7'd52;
+    localparam bit [6:0] RX_TIME_ELAPSED_AXIL_ADDR_0 = 7'd56;
+    localparam bit [6:0] RX_TIME_ELAPSED_AXIL_ADDR_1 = 7'd60;
+    localparam bit [6:0] RX_TRANSFERRED_SIZE_AXIL_ADDR_0 = 7'd64;
+    localparam bit [6:0] RX_TRANSFERRED_SIZE_AXIL_ADDR_1 = 7'd68;
+    localparam bit [6:0] LATENCY_SUM_AXIL_ADDR_0 = 7'd72;
+    localparam bit [6:0] LATENCY_SUM_AXIL_ADDR_1 = 7'd76;
+    localparam int ADDR_BITS = 7;
     localparam bit [1:0] WRIDLE = 2'd0;
     localparam bit [1:0] WRDATA = 2'd1;
     localparam bit [1:0] WRRESP = 2'd2;
@@ -126,28 +120,26 @@ module axil
     logic [ADDR_BITS-1:0] raddr;
 
 //user logic
-	logic [31:0] int_pause_axil_0;
-	logic [31:0] int_timeout_clr_axil_0;
-	logic [31:0] int_timeout_axil_0;
-	logic [31:0] int_loopback_axil_0;
-	logic [31:0] int_mismatch_cnt_axil_0;
-	logic [31:0] int_mismatch_cnt_axil_1;
-	logic [31:0] int_tx_pkt_cnt_axil_0;
-	logic [31:0] int_tx_pkt_cnt_axil_1;
-	logic [31:0] int_tx_pkt_time_cnt_axil_0;
-	logic [31:0] int_tx_pkt_time_cnt_axil_1;
-	logic [31:0] int_tx_pkt_timestamp_sum_axil_0;
-	logic [31:0] int_tx_pkt_timestamp_sum_axil_1;
-	logic [31:0] int_tx_transferred_size_axil_0;
-	logic [31:0] int_tx_transferred_size_axil_1;
-	logic [31:0] int_rx_pkt_cnt_axil_0;
-	logic [31:0] int_rx_pkt_cnt_axil_1;
-	logic [31:0] int_rx_pkt_time_cnt_axil_0;
-	logic [31:0] int_rx_pkt_time_cnt_axil_1;
-	logic [31:0] int_rx_pkt_timestamp_sum_axil_0;
-	logic [31:0] int_rx_pkt_timestamp_sum_axil_1;
-	logic [31:0] int_rx_transferred_size_axil_0;
-	logic [31:0] int_rx_transferred_size_axil_1;
+    logic [31:0] int_pause_axil_0;
+    logic [31:0] int_clear_axil_0;
+    logic [31:0] int_timeout_axil_0;
+    logic [31:0] int_loopback_axil_0;
+    logic [31:0] int_mismatch_axil_0;
+    logic [31:0] int_freq_axil_0;
+    logic [31:0] int_tx_pkt_cnt_axil_0;
+    logic [31:0] int_tx_pkt_cnt_axil_1;
+    logic [31:0] int_tx_time_elapsed_axil_0;
+    logic [31:0] int_tx_time_elapsed_axil_1;
+    logic [31:0] int_tx_transferred_size_axil_0;
+    logic [31:0] int_tx_transferred_size_axil_1;
+    logic [31:0] int_rx_pkt_cnt_axil_0;
+    logic [31:0] int_rx_pkt_cnt_axil_1;
+    logic [31:0] int_rx_time_elapsed_axil_0;
+    logic [31:0] int_rx_time_elapsed_axil_1;
+    logic [31:0] int_rx_transferred_size_axil_0;
+    logic [31:0] int_rx_transferred_size_axil_1;
+    logic [31:0] int_latency_sum_axil_0;
+    logic [31:0] int_latency_sum_axil_1;
     assign s_axil_awready = (wstate == WRIDLE);
     assign s_axil_wready = (wstate == WRDATA);
     assign s_axil_bresp = 2'b00;
@@ -189,8 +181,8 @@ module axil
     
     // waddr
     always_ff @(posedge clk) begin
-		if (aw_hs)
-			waddr <= s_axil_awaddr[ADDR_BITS-1:0];
+        if (aw_hs)
+            waddr <= s_axil_awaddr[ADDR_BITS-1:0];
     end
     
     //------------------------AXI read fsm-------------------
@@ -232,232 +224,214 @@ module axil
         if (ar_hs) begin
             rdata <= 1'b0;
             case (raddr)
-				PAUSE_AXIL_ADDR_0: begin
-					rdata <= int_pause_axil_0;
-				end
-				TIMEOUT_CLR_AXIL_ADDR_0: begin
-					rdata <= int_timeout_clr_axil_0;
-				end
-				TIMEOUT_AXIL_ADDR_0: begin
-					rdata <= int_timeout_axil_0;
-				end
-				LOOPBACK_AXIL_ADDR_0: begin
-					rdata <= int_loopback_axil_0;
-				end
-				MISMATCH_CNT_AXIL_ADDR_0: begin
-					rdata <= int_mismatch_cnt_axil_0;
-				end
-				MISMATCH_CNT_AXIL_ADDR_1: begin
-					rdata <= int_mismatch_cnt_axil_1;
-				end
-				TX_PKT_CNT_AXIL_ADDR_0: begin
-					rdata <= int_tx_pkt_cnt_axil_0;
-				end
-				TX_PKT_CNT_AXIL_ADDR_1: begin
-					rdata <= int_tx_pkt_cnt_axil_1;
-				end
-				TX_PKT_TIME_CNT_AXIL_ADDR_0: begin
-					rdata <= int_tx_pkt_time_cnt_axil_0;
-				end
-				TX_PKT_TIME_CNT_AXIL_ADDR_1: begin
-					rdata <= int_tx_pkt_time_cnt_axil_1;
-				end
-				TX_PKT_TIMESTAMP_SUM_AXIL_ADDR_0: begin
-					rdata <= int_tx_pkt_timestamp_sum_axil_0;
-				end
-				TX_PKT_TIMESTAMP_SUM_AXIL_ADDR_1: begin
-					rdata <= int_tx_pkt_timestamp_sum_axil_1;
-				end
-				TX_TRANSFERRED_SIZE_AXIL_ADDR_0: begin
-					rdata <= int_tx_transferred_size_axil_0;
-				end
-				TX_TRANSFERRED_SIZE_AXIL_ADDR_1: begin
-					rdata <= int_tx_transferred_size_axil_1;
-				end
-				RX_PKT_CNT_AXIL_ADDR_0: begin
-					rdata <= int_rx_pkt_cnt_axil_0;
-				end
-				RX_PKT_CNT_AXIL_ADDR_1: begin
-					rdata <= int_rx_pkt_cnt_axil_1;
-				end
-				RX_PKT_TIME_CNT_AXIL_ADDR_0: begin
-					rdata <= int_rx_pkt_time_cnt_axil_0;
-				end
-				RX_PKT_TIME_CNT_AXIL_ADDR_1: begin
-					rdata <= int_rx_pkt_time_cnt_axil_1;
-				end
-				RX_PKT_TIMESTAMP_SUM_AXIL_ADDR_0: begin
-					rdata <= int_rx_pkt_timestamp_sum_axil_0;
-				end
-				RX_PKT_TIMESTAMP_SUM_AXIL_ADDR_1: begin
-					rdata <= int_rx_pkt_timestamp_sum_axil_1;
-				end
-				RX_TRANSFERRED_SIZE_AXIL_ADDR_0: begin
-					rdata <= int_rx_transferred_size_axil_0;
-				end
-				RX_TRANSFERRED_SIZE_AXIL_ADDR_1: begin
-					rdata <= int_rx_transferred_size_axil_1;
-				end
+                PAUSE_AXIL_ADDR_0: begin
+                    rdata <= int_pause_axil_0;
+                end
+                CLEAR_AXIL_ADDR_0: begin
+                    rdata <= int_clear_axil_0;
+                end
+                TIMEOUT_AXIL_ADDR_0: begin
+                    rdata <= int_timeout_axil_0;
+                end
+                LOOPBACK_AXIL_ADDR_0: begin
+                    rdata <= int_loopback_axil_0;
+                end
+                MISMATCH_AXIL_ADDR_0: begin
+                    rdata <= int_mismatch_axil_0;
+                end
+                FREQ_AXIL_ADDR_0: begin
+                    rdata <= int_freq_axil_0;
+                end
+                TX_PKT_CNT_AXIL_ADDR_0: begin
+                    rdata <= int_tx_pkt_cnt_axil_0;
+                end
+                TX_PKT_CNT_AXIL_ADDR_1: begin
+                    rdata <= int_tx_pkt_cnt_axil_1;
+                end
+                TX_TIME_ELAPSED_AXIL_ADDR_0: begin
+                    rdata <= int_tx_time_elapsed_axil_0;
+                end
+                TX_TIME_ELAPSED_AXIL_ADDR_1: begin
+                    rdata <= int_tx_time_elapsed_axil_1;
+                end
+                TX_TRANSFERRED_SIZE_AXIL_ADDR_0: begin
+                    rdata <= int_tx_transferred_size_axil_0;
+                end
+                TX_TRANSFERRED_SIZE_AXIL_ADDR_1: begin
+                    rdata <= int_tx_transferred_size_axil_1;
+                end
+                RX_PKT_CNT_AXIL_ADDR_0: begin
+                    rdata <= int_rx_pkt_cnt_axil_0;
+                end
+                RX_PKT_CNT_AXIL_ADDR_1: begin
+                    rdata <= int_rx_pkt_cnt_axil_1;
+                end
+                RX_TIME_ELAPSED_AXIL_ADDR_0: begin
+                    rdata <= int_rx_time_elapsed_axil_0;
+                end
+                RX_TIME_ELAPSED_AXIL_ADDR_1: begin
+                    rdata <= int_rx_time_elapsed_axil_1;
+                end
+                RX_TRANSFERRED_SIZE_AXIL_ADDR_0: begin
+                    rdata <= int_rx_transferred_size_axil_0;
+                end
+                RX_TRANSFERRED_SIZE_AXIL_ADDR_1: begin
+                    rdata <= int_rx_transferred_size_axil_1;
+                end
+                LATENCY_SUM_AXIL_ADDR_0: begin
+                    rdata <= int_latency_sum_axil_0;
+                end
+                LATENCY_SUM_AXIL_ADDR_1: begin
+                    rdata <= int_latency_sum_axil_1;
+                end
             endcase
         end
     end
 
-	//------------------------user read logic-----------------
-	// int_axil_pkt_cnt_tx
-	always_ff @(posedge clk) begin
-		if (rst)
-			int_timeout_axil_0 <= 32'b0;
-		else
-			int_timeout_axil_0[0:0] <= timeout_axil;
-	end
-	// int_axil_pkt_cnt_tx
-	always_ff @(posedge clk) begin
-		if (rst)
-			int_loopback_axil_0 <= 32'b0;
-		else
-			int_loopback_axil_0[0:0] <= loopback_axil;
-	end
-	// int_axil_pkt_cnt_tx
-	always_ff @(posedge clk) begin
-		if (rst)
-			int_mismatch_cnt_axil_0 <= 32'b0;
-		else
-			int_mismatch_cnt_axil_0[31:0] <= mismatch_cnt_axil[31:0];
-	end
-	// int_axil_pkt_cnt_tx
-	always_ff @(posedge clk) begin
-		if (rst)
-			int_mismatch_cnt_axil_1 <= 32'b0;
-		else
-			int_mismatch_cnt_axil_1[31:0] <= mismatch_cnt_axil[63:32];
-	end
-	// int_axil_pkt_cnt_tx
-	always_ff @(posedge clk) begin
-		if (rst)
-			int_tx_pkt_cnt_axil_0 <= 32'b0;
-		else
-			int_tx_pkt_cnt_axil_0[31:0] <= tx_pkt_cnt_axil[31:0];
-	end
-	// int_axil_pkt_cnt_tx
-	always_ff @(posedge clk) begin
-		if (rst)
-			int_tx_pkt_cnt_axil_1 <= 32'b0;
-		else
-			int_tx_pkt_cnt_axil_1[31:0] <= tx_pkt_cnt_axil[63:32];
-	end
-	// int_axil_pkt_cnt_tx
-	always_ff @(posedge clk) begin
-		if (rst)
-			int_tx_pkt_time_cnt_axil_0 <= 32'b0;
-		else
-			int_tx_pkt_time_cnt_axil_0[31:0] <= tx_pkt_time_cnt_axil[31:0];
-	end
-	// int_axil_pkt_cnt_tx
-	always_ff @(posedge clk) begin
-		if (rst)
-			int_tx_pkt_time_cnt_axil_1 <= 32'b0;
-		else
-			int_tx_pkt_time_cnt_axil_1[31:0] <= tx_pkt_time_cnt_axil[63:32];
-	end
-	// int_axil_pkt_cnt_tx
-	always_ff @(posedge clk) begin
-		if (rst)
-			int_tx_pkt_timestamp_sum_axil_0 <= 32'b0;
-		else
-			int_tx_pkt_timestamp_sum_axil_0[31:0] <= tx_pkt_timestamp_sum_axil[31:0];
-	end
-	// int_axil_pkt_cnt_tx
-	always_ff @(posedge clk) begin
-		if (rst)
-			int_tx_pkt_timestamp_sum_axil_1 <= 32'b0;
-		else
-			int_tx_pkt_timestamp_sum_axil_1[31:0] <= tx_pkt_timestamp_sum_axil[63:32];
-	end
-	// int_axil_pkt_cnt_tx
-	always_ff @(posedge clk) begin
-		if (rst)
-			int_tx_transferred_size_axil_0 <= 32'b0;
-		else
-			int_tx_transferred_size_axil_0[31:0] <= tx_transferred_size_axil[31:0];
-	end
-	// int_axil_pkt_cnt_tx
-	always_ff @(posedge clk) begin
-		if (rst)
-			int_tx_transferred_size_axil_1 <= 32'b0;
-		else
-			int_tx_transferred_size_axil_1[31:0] <= tx_transferred_size_axil[63:32];
-	end
-	// int_axil_pkt_cnt_tx
-	always_ff @(posedge clk) begin
-		if (rst)
-			int_rx_pkt_cnt_axil_0 <= 32'b0;
-		else
-			int_rx_pkt_cnt_axil_0[31:0] <= rx_pkt_cnt_axil[31:0];
-	end
-	// int_axil_pkt_cnt_tx
-	always_ff @(posedge clk) begin
-		if (rst)
-			int_rx_pkt_cnt_axil_1 <= 32'b0;
-		else
-			int_rx_pkt_cnt_axil_1[31:0] <= rx_pkt_cnt_axil[63:32];
-	end
-	// int_axil_pkt_cnt_tx
-	always_ff @(posedge clk) begin
-		if (rst)
-			int_rx_pkt_time_cnt_axil_0 <= 32'b0;
-		else
-			int_rx_pkt_time_cnt_axil_0[31:0] <= rx_pkt_time_cnt_axil[31:0];
-	end
-	// int_axil_pkt_cnt_tx
-	always_ff @(posedge clk) begin
-		if (rst)
-			int_rx_pkt_time_cnt_axil_1 <= 32'b0;
-		else
-			int_rx_pkt_time_cnt_axil_1[31:0] <= rx_pkt_time_cnt_axil[63:32];
-	end
-	// int_axil_pkt_cnt_tx
-	always_ff @(posedge clk) begin
-		if (rst)
-			int_rx_pkt_timestamp_sum_axil_0 <= 32'b0;
-		else
-			int_rx_pkt_timestamp_sum_axil_0[31:0] <= rx_pkt_timestamp_sum_axil[31:0];
-	end
-	// int_axil_pkt_cnt_tx
-	always_ff @(posedge clk) begin
-		if (rst)
-			int_rx_pkt_timestamp_sum_axil_1 <= 32'b0;
-		else
-			int_rx_pkt_timestamp_sum_axil_1[31:0] <= rx_pkt_timestamp_sum_axil[63:32];
-	end
-	// int_axil_pkt_cnt_tx
-	always_ff @(posedge clk) begin
-		if (rst)
-			int_rx_transferred_size_axil_0 <= 32'b0;
-		else
-			int_rx_transferred_size_axil_0[31:0] <= rx_transferred_size_axil[31:0];
-	end
-	// int_axil_pkt_cnt_tx
-	always_ff @(posedge clk) begin
-		if (rst)
-			int_rx_transferred_size_axil_1 <= 32'b0;
-		else
-			int_rx_transferred_size_axil_1[31:0] <= rx_transferred_size_axil[63:32];
-	end
+    //------------------------user read logic-----------------
+    // int_timeout_axil_0
+    always_ff @(posedge clk) begin
+        if (rst)
+            int_timeout_axil_0 <= 32'b0;
+        else
+            int_timeout_axil_0[0:0] <= timeout_axil;
+    end
+    // int_loopback_axil_0
+    always_ff @(posedge clk) begin
+        if (rst)
+            int_loopback_axil_0 <= 32'b0;
+        else
+            int_loopback_axil_0[0:0] <= loopback_axil;
+    end
+    // int_mismatch_axil_0
+    always_ff @(posedge clk) begin
+        if (rst)
+            int_mismatch_axil_0 <= 32'b0;
+        else
+            int_mismatch_axil_0[0:0] <= mismatch_axil;
+    end
+    // int_freq_axil_0
+    always_ff @(posedge clk) begin
+        if (rst)
+            int_freq_axil_0 <= 32'b0;
+        else
+            int_freq_axil_0[31:0] <= freq_axil[31:0];
+    end
+    // int_tx_pkt_cnt_axil_0
+    always_ff @(posedge clk) begin
+        if (rst)
+            int_tx_pkt_cnt_axil_0 <= 32'b0;
+        else
+            int_tx_pkt_cnt_axil_0[31:0] <= tx_pkt_cnt_axil[31:0];
+    end
+    // int_tx_pkt_cnt_axil_1
+    always_ff @(posedge clk) begin
+        if (rst)
+            int_tx_pkt_cnt_axil_1 <= 32'b0;
+        else
+            int_tx_pkt_cnt_axil_1[31:0] <= tx_pkt_cnt_axil[63:32];
+    end
+    // int_tx_time_elapsed_axil_0
+    always_ff @(posedge clk) begin
+        if (rst)
+            int_tx_time_elapsed_axil_0 <= 32'b0;
+        else
+            int_tx_time_elapsed_axil_0[31:0] <= tx_time_elapsed_axil[31:0];
+    end
+    // int_tx_time_elapsed_axil_1
+    always_ff @(posedge clk) begin
+        if (rst)
+            int_tx_time_elapsed_axil_1 <= 32'b0;
+        else
+            int_tx_time_elapsed_axil_1[31:0] <= tx_time_elapsed_axil[63:32];
+    end
+    // int_tx_transferred_size_axil_0
+    always_ff @(posedge clk) begin
+        if (rst)
+            int_tx_transferred_size_axil_0 <= 32'b0;
+        else
+            int_tx_transferred_size_axil_0[31:0] <= tx_transferred_size_axil[31:0];
+    end
+    // int_tx_transferred_size_axil_1
+    always_ff @(posedge clk) begin
+        if (rst)
+            int_tx_transferred_size_axil_1 <= 32'b0;
+        else
+            int_tx_transferred_size_axil_1[31:0] <= tx_transferred_size_axil[63:32];
+    end
+    // int_rx_pkt_cnt_axil_0
+    always_ff @(posedge clk) begin
+        if (rst)
+            int_rx_pkt_cnt_axil_0 <= 32'b0;
+        else
+            int_rx_pkt_cnt_axil_0[31:0] <= rx_pkt_cnt_axil[31:0];
+    end
+    // int_rx_pkt_cnt_axil_1
+    always_ff @(posedge clk) begin
+        if (rst)
+            int_rx_pkt_cnt_axil_1 <= 32'b0;
+        else
+            int_rx_pkt_cnt_axil_1[31:0] <= rx_pkt_cnt_axil[63:32];
+    end
+    // int_rx_time_elapsed_axil_0
+    always_ff @(posedge clk) begin
+        if (rst)
+            int_rx_time_elapsed_axil_0 <= 32'b0;
+        else
+            int_rx_time_elapsed_axil_0[31:0] <= rx_time_elapsed_axil[31:0];
+    end
+    // int_rx_time_elapsed_axil_1
+    always_ff @(posedge clk) begin
+        if (rst)
+            int_rx_time_elapsed_axil_1 <= 32'b0;
+        else
+            int_rx_time_elapsed_axil_1[31:0] <= rx_time_elapsed_axil[63:32];
+    end
+    // int_rx_transferred_size_axil_0
+    always_ff @(posedge clk) begin
+        if (rst)
+            int_rx_transferred_size_axil_0 <= 32'b0;
+        else
+            int_rx_transferred_size_axil_0[31:0] <= rx_transferred_size_axil[31:0];
+    end
+    // int_rx_transferred_size_axil_1
+    always_ff @(posedge clk) begin
+        if (rst)
+            int_rx_transferred_size_axil_1 <= 32'b0;
+        else
+            int_rx_transferred_size_axil_1[31:0] <= rx_transferred_size_axil[63:32];
+    end
+    // int_latency_sum_axil_0
+    always_ff @(posedge clk) begin
+        if (rst)
+            int_latency_sum_axil_0 <= 32'b0;
+        else
+            int_latency_sum_axil_0[31:0] <= latency_sum_axil[31:0];
+    end
+    // int_latency_sum_axil_1
+    always_ff @(posedge clk) begin
+        if (rst)
+            int_latency_sum_axil_1 <= 32'b0;
+        else
+            int_latency_sum_axil_1[31:0] <= latency_sum_axil[63:32];
+    end
     //------------------------user write logic-----------------
     // int_pause_axil_0
     always_ff @(posedge clk) begin
         if (rst)
-            int_pause_axil_0 <= 32'b1;
+            int_pause_axil_0 <= 32'b0;
         else if (w_hs && waddr == PAUSE_AXIL_ADDR_0)
             int_pause_axil_0 <= (s_axil_wdata[31:0] & wmask) | (int_pause_axil_0 & ~wmask);
     end
-    // int_timeout_clr_axil_0
+    // int_clear_axil_0
     always_ff @(posedge clk) begin
         if (rst)
-            int_timeout_clr_axil_0 <= 32'b0;
-        else if (w_hs && waddr == TIMEOUT_CLR_AXIL_ADDR_0)
-            int_timeout_clr_axil_0 <= (s_axil_wdata[31:0] & wmask) | (int_timeout_clr_axil_0 & ~wmask);
+            int_clear_axil_0 <= 32'b0;
+        else if (int_clear_axil_0 != 32'b0)
+            int_clear_axil_0 <= 32'b0;
+        else if (w_hs && waddr == CLEAR_AXIL_ADDR_0)
+            int_clear_axil_0 <= (s_axil_wdata[31:0] & wmask) | (int_clear_axil_0 & ~wmask);
     end
-	assign pause_axil = int_pause_axil_0[0:0];
-	assign timeout_clr_axil = int_timeout_clr_axil_0[0:0];
+    assign pause_axil = int_pause_axil_0[0:0];
+    assign clear_axil = int_clear_axil_0[0:0];
 endmodule

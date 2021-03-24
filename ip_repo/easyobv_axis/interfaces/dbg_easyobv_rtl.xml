@@ -7,7 +7,7 @@
   <spirit:busType spirit:vendor="clarkshen.com" spirit:library="user" spirit:name="dbg_easyobv" spirit:version="1.0"/>
   <spirit:ports>
     <spirit:port>
-      <spirit:logicalName>mismatch_cnt</spirit:logicalName>
+      <spirit:logicalName>mismatch</spirit:logicalName>
       <spirit:wire/>
     </spirit:port>
     <spirit:port>
@@ -19,11 +19,7 @@
       <spirit:wire/>
     </spirit:port>
     <spirit:port>
-      <spirit:logicalName>tx_pkt_time_cnt</spirit:logicalName>
-      <spirit:wire/>
-    </spirit:port>
-    <spirit:port>
-      <spirit:logicalName>tx_pkt_timestamp_sum</spirit:logicalName>
+      <spirit:logicalName>tx_time_elapsed</spirit:logicalName>
       <spirit:wire/>
     </spirit:port>
     <spirit:port>
@@ -35,15 +31,15 @@
       <spirit:wire/>
     </spirit:port>
     <spirit:port>
-      <spirit:logicalName>rx_pkt_time_cnt</spirit:logicalName>
-      <spirit:wire/>
-    </spirit:port>
-    <spirit:port>
-      <spirit:logicalName>rx_pkt_timestamp_sum</spirit:logicalName>
+      <spirit:logicalName>rx_time_elapsed</spirit:logicalName>
       <spirit:wire/>
     </spirit:port>
     <spirit:port>
       <spirit:logicalName>rx_transferred_size</spirit:logicalName>
+      <spirit:wire/>
+    </spirit:port>
+    <spirit:port>
+      <spirit:logicalName>latency_sum</spirit:logicalName>
       <spirit:wire/>
     </spirit:port>
   </spirit:ports>

@@ -26,7 +26,7 @@ module axis_gen #
     input logic rst,
 //user signals
     input logic pause,
-    input logic timeout_clr,
+    input logic clear,
     output logic timeout,
 //instruction
     input logic [INSTR_WIDTH-1:0] instr_tdata,
@@ -146,7 +146,7 @@ module axis_gen #
             always_ff @(posedge clk) begin
                 if (rst)
                     timeout_cnt <= TIMEOUT_VAL;
-                else if (timeout_clr)
+                else if (clear)
                     timeout_cnt <= TIMEOUT_VAL;
                 else if (tready_mask | (tready_user ~^ tready_int))
                     if (instr_tdata[TIMEOUT_IDX-:TIMEOUT_WIDTH] == {TIMEOUT_WIDTH{1'b0}})
@@ -160,7 +160,7 @@ module axis_gen #
         always_ff @(posedge clk) begin
             if (rst)
                 timeout <= 1'b0;
-            else if (timeout_clr)
+            else if (clear)
                 timeout <= 1'b0;
             else if (timeout_cnt == {TIMEOUT_WIDTH{1'b0}})
                 timeout <= 1'b1;

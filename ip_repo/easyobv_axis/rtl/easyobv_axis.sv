@@ -23,7 +23,9 @@ module easyobv_axis #
 //Instruction width
     parameter int INSTR_WIDTH = 32,
 //Traffic Monitor options
-    parameter int CMP_FIFO_DEPTH = 16
+    parameter int CMP_FIFO_DEPTH = 16,
+//Clock frequency
+    parameter int CLK_FREQ = 100000000
 )
 (
     input logic clk,
@@ -50,7 +52,7 @@ module easyobv_axis #
 //traffic gen
     //user signals
     input logic pause,
-    input logic timeout_clr,
+    input logic clear,
     output logic timeout,
     //instruction
     input logic [INSTR_WIDTH-1:0] instr_tdata,
@@ -70,7 +72,7 @@ module easyobv_axis #
     //rx
     input logic [DWIDTH-1:0] rx_mon_tdata,
     input logic rx_mon_tvalid,
-    output logic rx_mon_tready,
+    input logic rx_mon_tready,
     input logic [DWIDTH/8-1:0] rx_mon_tkeep,
     input logic rx_mon_tlast = 1'b1,
     input logic [DWIDTH/8-1:0] rx_mon_tstrb,
@@ -78,34 +80,33 @@ module easyobv_axis #
     input logic [`WIDTH_VAL(USER_WIDTH)-1:0] rx_mon_tuser,
     input logic [`WIDTH_VAL(ID_WIDTH)-1:0] rx_mon_tid,
     //stats
-    output logic [63:0] mismatch_cnt,
+    output logic mismatch,
     output logic [63:0] time_cnt,
     output logic [63:0] tx_pkt_cnt,
-    output logic [63:0] tx_pkt_time_cnt,
-    output logic [63:0] tx_pkt_timestamp_sum,
+    output logic [63:0] tx_time_elapsed,
     output logic [63:0] tx_transferred_size,
     output logic [63:0] rx_pkt_cnt,
-    output logic [63:0] rx_pkt_time_cnt,
-    output logic [63:0] rx_pkt_timestamp_sum,
-    output logic [63:0] rx_transferred_size
+    output logic [63:0] rx_time_elapsed,
+    output logic [63:0] rx_transferred_size,
+    output logic [63:0] latency_sum
 );
     logic pause_int;
-    logic timeout_clr_int;
+    logic clear_int;
 
     if (EN_AXIL) begin
         logic pause_axil;
-        logic timeout_clr_axil;
+        logic clear_axil;
         logic timeout_axil;
         logic loopback_axil;
-        logic [63:0] mismatch_cnt_axil;
+        logic mismatch_axil;
+        logic [31:0] freq_axil;
         logic [63:0] tx_pkt_cnt_axil;
-        logic [63:0] tx_pkt_time_cnt_axil;
-        logic [63:0] tx_pkt_timestamp_sum_axil;
+        logic [63:0] tx_time_elapsed_axil;
         logic [63:0] tx_transferred_size_axil;
         logic [63:0] rx_pkt_cnt_axil;
-        logic [63:0] rx_pkt_time_cnt_axil;
-        logic [63:0] rx_pkt_timestamp_sum_axil;
+        logic [63:0] rx_time_elapsed_axil;
         logic [63:0] rx_transferred_size_axil;
+        logic [63:0] latency_sum_axil;
 
         axil u_axil(
             .*,
@@ -115,12 +116,14 @@ module easyobv_axis #
         cdc u_cdc(
             .*,
             .pause(pause_int),
-            .timeout_clr(timeout_clr_int)
+            .clear(clear_int)
         );
+        assign loopback_axil = MODE == 2'd2;
+        assign freq_axil = 32'(CLK_FREQ);
     end
     else begin
         assign pause_int = pause;
-        assign timeout_clr_int = timeout_clr;
+        assign clear_int = clear;
     end
     axis_gen #(
         .DWIDTH              (DWIDTH              ),
@@ -139,7 +142,7 @@ module easyobv_axis #
     ) u_axis_gen(
         .*,
         .pause(pause_int),
-        .timeout_clr(timeout_clr_int),
+        .clear(clear_int),
         .timeout(timeout)
     );
     if (MODE > 2'd0) begin
@@ -156,6 +159,7 @@ module easyobv_axis #
             .CMP_FIFO_DEPTH (CMP_FIFO_DEPTH )
         ) u_axis_mon(
             .*,
+            .rst           (rst|clear_int),
             .tx_mon_tdata  (traffic_tdata),
             .tx_mon_tvalid (traffic_tvalid),
             .tx_mon_tkeep  (traffic_tkeep),
