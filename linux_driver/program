@@ -1,18 +1,59 @@
 #!/usr/bin/python3
 import libeasyobv as easyobv
+import argparse
 import sys
 import os
+import contextlib
+
+class DummyFile(object):
+    def write(self, x): pass
+
+@contextlib.contextmanager
+def nostdout():
+    save_stdout = sys.stdout
+    sys.stdout = DummyFile()
+    yield
+    sys.stdout = save_stdout
 
 def getext(fname):
     return os.path.splitext(fname)[1]
 
+def msg(name=None):
+    return '''program [-n 1] input1.csv [input2.csv] ... [inputN.csv]'''
+
+class arg_parser:
+    def __init__(self):
+        self.parser = argparse.ArgumentParser(
+            prog='program',
+            formatter_class=argparse.MetavarTypeHelpFormatter,
+            description='Available options:', usage=msg())
+        self.parser.add_argument('file_list', metavar='<input files>', type=str, nargs='+', help='input file paths')
+        self.parser.add_argument('-n', '--repeat_cnt', default=1, type=int, help='set how many iterations to run, 0 means repeat forever')
+        self.parser.add_argument('-q', '--quiet', action='store_true', help='silent the stdout from thie program')
+    def parse(self):
+        args = self.parser.parse_args()
+        self.file_list = args.file_list
+        self.n = args.repeat_cnt
+        self.q = args.quiet
+        if len(self.file_list) == 0:
+            print("ERROR: no input file is provided!")
+            return True
+        for f in self.file_list:
+            if getext(f) != '.csv' and getext(f) != '.bin' and getext(f) != '.txt' and arg != '-':
+                print("Wrong input file extension, expect '.csv', '.bin', '.txt' or '-'")
+                return True
+        if self.n < 0:
+            print("ERROR: iteration count is less than 0")
+            return True
+        return False
+
+
 if __name__ == '__main__':
-    args = sys.argv[1:]
-    for arg in args:
-        if getext(arg) != '.csv' and getext(arg) != '.bin' and getext(arg) != '.txt' and arg != '-':
-            print("Argument error!")
-            print("Usage:\n    ./program <traffic0> <traffic1> .. <trafficN>\n")
-            print("Supported file extensions: csv, bin, and txt")
-            print("Example:\n    ./program traffic0.csv traffic1.bin - traffic3.bin ('-' means the correspoding channel is skipped)")
-            sys.exit()
-    easyobv.program(args,0)
+    args = arg_parser()
+    if args.parse():
+        sys.exit()
+    if args.q:
+        with nostdout():
+            easyobv.program(args.file_list,args.n)
+    else:
+        easyobv.program(args.file_list,args.n)

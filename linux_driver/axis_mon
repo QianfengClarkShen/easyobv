@@ -1,0 +1,52 @@
+#!/usr/bin/python3
+import sys
+import libfpga as fpga
+import time
+
+def flushline(n=1):
+    for i in range(n):
+        print('\x1b[1A\x1b[2K',end='')
+
+PAUSE_ADDR = 0x0
+CLAER_ADDR = 0x4
+TIMEOUT_ADDR = 0x8
+LOOPBACK_ADDR = 0xC
+MISMATCH_ADDR = 0x10
+FREQ_ADDR = 0x14
+TX_PKT_CNT_ADDR = 0x18
+TX_TIME_ELAPSED_ADDR = 0x20
+TX_SIZE_ADDR = 0x28
+RX_PKT_CNT_ADDR = 0x30
+RX_TIME_ELAPSED_ADDR = 0x38
+RX_SIZE_ADDR = 0x40
+LATENCY_SUM_ADDR = 0x48
+
+if __name__ == '__main__':
+    addr = int(sys.argv[1],16)
+    easy_traffic_mon = fpga.axilite(addr)
+    clk_freq = easy_traffic_mon.read32(FREQ_ADDR)
+    if easy_traffic_mon.read32(LOOPBACK_ADDR) != 0:
+        en_loopback = True
+    else:
+        en_loopback = False
+    tx_pkt_cnt = easy_traffic_mon.read64(TX_PKT_CNT_ADDR)
+    tx_time_elapsed = easy_traffic_mon.read64(TX_TIME_ELAPSED_ADDR)
+    tx_transferred_size = easy_traffic_mon.read64(TX_SIZE_ADDR)*8
+    tx_mpps = clk_freq*tx_pkt_cnt/tx_time_elapsed/10**6
+    tx_gbps = clk_freq*tx_transferred_size/tx_time_elapsed/10**9
+    print("%f Gbits data has been sent" % (tx_transferred_size/10**9))
+    print("tx throuput: %.2f Gbps / %.2f Mpps" % (tx_gbps,tx_mpps))
+    if en_loopback:
+        rx_pkt_cnt = easy_traffic_mon.read64(RX_PKT_CNT_ADDR)
+        rx_time_elapsed = easy_traffic_mon.read64(RX_TIME_ELAPSED_ADDR)
+        rx_transferred_size = easy_traffic_mon.read64(RX_SIZE_ADDR)*8
+        rx_mpps = clk_freq*rx_pkt_cnt/rx_time_elapsed/10**6
+        rx_gbps = clk_freq*rx_transferred_size/rx_time_elapsed/10**9
+        print("rx throuput: %.2f Gbps / %.2f Mpps" % (rx_gbps,rx_mpps))
+        latency_sum = easy_traffic_mon.read64(LATENCY_SUM_ADDR)
+        latency = latency_sum/rx_pkt_cnt/clk_freq*10**9
+        print("latency: %f ns" % latency)
+        if easy_traffic_mon.read32(MISMATCH_ADDR) != 0:
+            print("at least one rx packet mismatched with tx packet!")
+        else:
+            print("all rx packets matched with tx packets!")
